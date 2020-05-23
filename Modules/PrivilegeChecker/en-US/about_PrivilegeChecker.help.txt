@@ -1,0 +1,25 @@
+﻿TOPIC
+
+about_PrivilegeChecker
+
+SHORT DESCRIPTION
+
+Determines Windows whether privileges are elevated.
+
+LONG DESCRIPTION
+
+The PrivilegeChecker class contains a static method PrivilegesAreElevated() that returns a boolean according to whether privileges of the calling PowerShell session are elevated.
+
+EXAMPLES
+
+using Module PrivilegeChecker
+$pc = [PrivilegeChecker]::new()
+$elevated = $pc::PrivilegesAreElevated()
+
+KEYWORDS
+
+Module, class, privileges, elevate.
+
+SEE ALSO
+
+ErrorInfo module.
