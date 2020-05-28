@@ -3,18 +3,21 @@
 Error handling design pattern demo and test
 
 .Description
-Demonstrates various error handling design patterns. Runs tests in order to ensure that the patterns work with different powershell versions: See suite.ps1.
+Demonstrates various error handling design patterns. Runs tests in order to ensure that the patterns work with different powershell versions.
 
 .Link
 https://docs.microsoft.com/en-us/dotnet/api/system.management.automation.errorrecord
+
 .Link
 https://powershellexplained.com/2017-04-10-Powershell-exceptions-everything-you-ever-wanted-to-know/#psitem
+
 .Link
 https://vexx32.github.io/2019/01/31/PowerShell-Error-Handling/
 
 #>
 using namespace System.Management.Automation
 using Module IntegrationTester
+using Module ErrorRemover
 
 $t = [IntegrationTester]::new()
 
@@ -107,7 +110,7 @@ $t.describe( 'DP4: EV, advanced function' )
 $t.describe( 'DP5: $global:Error')
 
     $t.it( 'should catch the error' )
-    $initialCount = Remove-Error
+    $initialCount = [ErrorRemover]::new().RemoveError()
     $e = $null
     $giArgs = @{ Path = '/NoSuch.txtxt'
                  ErrorAction = 'SilentlyContinue' }

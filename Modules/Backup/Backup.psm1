@@ -20,11 +20,17 @@ function Copy-FSItem
             return
         }
         if( $null -eq $ss.Force )
-            { $ss.Force = $false }
+        {
+            $ss.Force = $false
+        }
         if( $null -eq $ss.Include )
-            { $ss.Include = '*' }
+        {
+            $ss.Include = '*'
+        }
         if( $null -eq $ss.Subfolders )
-            { $ss.Subfolders = $false }
+        {
+            $ss.Subfolders = $false
+        }
         New-Folder $ss.Dest -ErrorAction 'Stop'
         
         $ciArgs = @{
@@ -129,36 +135,13 @@ function Copy-Here
     #>
 }
 
-function Test-Versions
+function Get-Progress( [Hashtable] $Spec )
 {
-<#
-.Synopsis
-Test file, save version if matching
+    <#
+    .Synopsis
+    Calculate backup progress
+    #>
 
-.Notes
-Not for export
-#>
-    param(
-        [parameter( Mandatory = $true )]
-        [Hashtable[]] $Versions,
-        [parameter( Mandatory = $true )]
-        [System.IO.FileInfo] $File
-    )
-    foreach( $version in $Versions ) {
-        if( $File.Name -Like $version.Include ) {
-            $args = @{ Version = $version
-                       File = $File 
-                       ErrorAction = 'Stop' }
-            Backup-Version @args
-            Remove-ExcessVersions @args
-        }
-    }
-}
-
-function Get-Progress
-{
-    param( [Hashtable] $Spec )
-    
     $x = $Spec.ProgressActual
     $y = $x/$Spec.ProgressExpected * 100
     $Spec.PercentComplete =
@@ -167,10 +150,10 @@ function Get-Progress
 
 function Optimize-Percent( [Single] $x )
 {
-<#
-.Synopsis
-Validate Write-Progress -PercentComplete
-#> 
+    <#
+    .Synopsis
+    Validate Write-Progress -PercentComplete
+    #> 
     if( $x -lt 0 )
     {
         return 0
@@ -186,7 +169,17 @@ Validate Write-Progress -PercentComplete
 }
 
 function Get-BackupFiles
-{
+{    <#
+    .Synopsis
+    Returns the files to backup.
+    .Description
+    Returns the files to backup for one hashtable/spec.
+    .Parameter Spec
+    For hashtable requirements, see Get-Help Backup-Updates -Detailed.
+    .Notes
+    For internal use. Exported for testing.
+    The validation function Optimize-SpecData is called before this one.
+    #>
     param( [parameter( Mandatory = $true )]
            [Hashtable] $Spec )
 
@@ -260,18 +253,6 @@ function Get-BackupFiles
     }
 
     return $files
-
-    <#
-    .Synopsis
-    Returns the files to backup.
-    .Description
-    Returns the files to backup for one hashtable/spec.
-    .Parameter Spec
-    For hashtable requirements, see Get-Help Backup-Updates -Detailed.
-    .Notes
-    For internal use. Exported for testing.
-    The validation function Optimize-SpecData is called before this one.
-    #>
 }
 
 function Get-CommonBackupPath
@@ -349,14 +330,14 @@ function Optimize-SpecData
     {
         # throw error
         $ss.OptimizeError = $true
-        $contextMessage = "The Include key is required. It accepts one or more wildcard expressions used to specify what files will be backed up for '{0}'." -f $ss.Name
+        $contextMessage = "The Include key is required. It accepts one or more wildcard expressions that are used to specify what files will be backed up for '{0}'." -f $ss.Name
         $exc = [ArgumentException]::new()
         $localizedMessage = $exc.Message
         $message = "{0} {1}{2}" -f @(
             $localizedMessage, $contextMessage, $specFile )
         $errorRecord = [ErrorRecord]::new(
             [ArgumentException]::new( $message ),
-            "MissingRequiredBackupSpecKeyInclude",
+            "MissingBackupHashtableKeyInclude",
             [ErrorCategory]::InvalidArgument,
             $ss )
         $PSCmdlet.WriteError( $errorRecord )
@@ -431,21 +412,21 @@ function Optimize-SpecData
             'Skipping backup spec'
             $ss.Name
             'Check source folder spelling.'
-            $specFile )
+            $specFile
+        )
         $exc = [DirectoryNotFoundException]::new()
         $message = "{0} {1}" -f @(
             $exc.Message # localized message
             $contextMessage )
-        $exception = [DirectoryNotFoundException]::new( $message )
         $errorRecord = [ErrorRecord]::new(
-                $exception,
-                "InvalidOrMissingBackupSourceFolder",
-                [ErrorCategory]::ObjectNotFound,
-                $ss.Src )
+            [DirectoryNotFoundException]::new( $message ),
+            "InvalidOrMissingBackupSourceFolder",
+            [ErrorCategory]::ObjectNotFound,
+            $ss.Src
+        )
         $PSCmdlet.WriteError( $errorRecord )
         [ErrorInfo]::new( $errorRecord, $message )
     }
-
     $BackupSpy.OptimizeCalls++
 
 <#
@@ -600,6 +581,7 @@ function Backup-Updates
                 $dFile ='{0}\{1}' -f $Dest, $file.Name
                 $TvArgs = @{ File = Get-Item $dFile 
                     Versions = $Spec.VersionsOnDest }
+                $Spec.FileInfo = $TvArgs.File
                 Test-Versions @TvArgs
             }
             if( $null -eq $Spec.DontResetArchiveBit -or
@@ -619,8 +601,7 @@ function Backup-Updates
     Backs up a folder
         
     .Description
-    Backs up a folder based on hashtable settings. Suitable for frequent backups of changed files.
-    Only copies files with archive bit set (changed files). Clears the archive bit after copy. 
+    The Backup-Updates module backs up a folder's changed files based on hashtable settings. 
         
     .Parameter SpecSheet
     Hashtable(s) intended to be input from the pipeline or as a parameter.
@@ -676,11 +657,11 @@ function Backup-Updates
     $SpecSheets | Backup-Updates
         
     .Inputs
-    Hashtable(s) (System.Collections.Hashtable).
+    System.Collections.Hashtable object(s).
 
     .Outputs
     System.IO.FileInfo object(s) for the source file for each file copied.
-    System.Management.Automation.ErrorRecord objects may be sent to the success pipeline.
+    [ErrorInfo] objects may be sent to the success pipeline.
         
     .Notes
     Calls the Update-Folder function for each hashtable.
@@ -688,28 +669,56 @@ function Backup-Updates
 
 }
 
+function Test-Versions
+{
+    <#
+    .Synopsis
+    Test a file and possibly save a version.
+
+    .Notes
+    Not for export
+    #>
+    param(
+        [parameter( Mandatory = $true )]
+        [Hashtable[]] $Versions,
+
+        [parameter( Mandatory = $true )]
+        [System.IO.FileInfo] $File
+    )
+    foreach( $version in $Versions ) {
+
+        if( $File.Name -Like $version.Include ) {
+            $args = @{ Version = $version
+                       File = $File 
+                       ErrorAction = 'Stop' }
+            Backup-Version @args
+            Remove-ExcessVersions @args
+        }
+    }
+}
+
 function Get-VersionsFolder
 {
     param(
         [parameter( Mandatory = $true )]
         [Hashtable] $Version,
+
         [parameter( Mandatory = $true )]
         [System.IO.FileInfo] $File
     )
     $root = $File.DirectoryName
-    $name = $Version.Include.
-        Replace( '*', '@' ).
-        Replace( '?', '#' )
-    $vfn = $VersionsFolderName
     
-    $testStr = '*\{0}\*' -f $vfn
-    if( $root -like $testStr )
+    if( $root -like "*\$VersionsFolderName\*" -And -Not
+        $BackupSpy.FailTestVofV )
     {
         # don't save a version of a version
         return [String]::Empty
     }
-        
-    $folder = "{0}\{1}\{2}" -f $root, $vfn, $name
+    $name = $Version.Include.
+        Replace( '*', '@' ).
+        Replace( '?', '#' )
+
+    $folder = "$root\$VersionsFolderName\$name"
     New-Folder $folder
     return $folder
 }
@@ -719,6 +728,7 @@ function Backup-Version
     param(
         [parameter( Mandatory = $true )]
         [Hashtable] $Version,
+
         [parameter( Mandatory = $true,
             ValueFromPipeline = $true )]
         [System.IO.FileInfo] $File
@@ -756,15 +766,16 @@ function Remove-ExcessVersions
     param(
         [parameter( Mandatory = $true )]
         [Hashtable] $Version,
+
         [parameter( Mandatory = $true )]
-        [IO.FileInfo] $File
+        [System.IO.FileInfo] $File
     )
-    $gvfArgs = @{
-        File = $File; Version = $Version }
-    $targetFolder =
-        Get-VersionsFolder @gvfArgs
+    $gvfArgs = @{ File = $File; Version = $Version }
+    $targetFolder = Get-VersionsFolder @gvfArgs
     if( [String]::Empty -eq $targetFolder )
-            { return }
+    {
+        return
+    }
     $filter = "{0}_????-??-??--??????{1}" -f @(
         $File.BaseName
         $File.Extension )
@@ -785,15 +796,16 @@ function Remove-ExcessVersions
             $i++
             if( $i -gt $Version.MaxQty ) 
             {
+                $file = $_
                 try
                 {
-                    $_.Delete()
+                    $file.Delete()
                 }
                 catch [System.UnauthorizedAccessException]
                 {
                     # Clear read-only bit and try again
-                    $_.Attributes = $_.Attributes -band -bnot 1
-                    $_.Delete()
+                    $file.Attributes = $file.Attributes -band -bnot 1
+                    $file.Delete()
                 }
             }
         }
@@ -804,6 +816,7 @@ $BackupSpy = @{
     OptimizeCalls = 0
     RemoveCalls = 0
     Version = $null
+    FailTestVofV = $false
 }
 $DefaultMaxVersionQty = 5
 $VersionsFolderName = 'versions'

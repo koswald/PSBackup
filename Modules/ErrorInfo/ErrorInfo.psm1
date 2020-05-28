@@ -1,11 +1,7 @@
-# for OrderedDictionary
-using namespace System.Collections.Specialized
-# for PSCustomObject, ErrorRecord, InvocationInfo
-using namespace System.Management.Automation
-# for Process
-using namespace System.Diagnostics
-# for Path
-using namespace System.IO
+using namespace System.Collections.Specialized # for OrderedDictionary
+using namespace System.Management.Automation # for PSCustomObject, ErrorRecord, InvocationInfo
+using namespace System.Diagnostics # for Process
+using namespace System.IO # for Path
 
 # ErrorInfo class: an object based on ErrorRecord
 
@@ -24,8 +20,7 @@ class ErrorInfo
     }
     
     # constructor #2
-    ErrorInfo( [ErrorRecord] $er,
-               [String] $message )
+    ErrorInfo( [ErrorRecord] $er, [String] $message )
     {
         $this.Init( $er, $message )
     }
@@ -45,8 +40,7 @@ class ErrorInfo
         $this.LineNumber =$info.ScriptLineNumber
     }
     
-    hidden Init( [ErrorRecord] $er,
-                 [String] $message )
+    hidden Init( [ErrorRecord] $er, [String] $message )
     {
         $this.Init( $er )
         $this.Message = "{0} {1}" -f @(

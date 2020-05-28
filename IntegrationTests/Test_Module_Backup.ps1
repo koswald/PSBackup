@@ -92,7 +92,7 @@ $specs = @(
 
 $initialOptimizeCalls = $BackupSpy.OptimizeCalls
 $initialRemoveCalls = $BackupSpy.RemoveCalls
-$specs | Backup-Updates
+$specs | Backup-Updates | Out-Null
 
 #begin tests
 $t = [IntegrationTester]::new()

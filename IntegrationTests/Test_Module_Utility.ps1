@@ -58,6 +58,12 @@ $t.AssertEqual(
     $true
 )
 
+$t.it( 'should create parent folders' )
+New-Folder '.2560/2560/2560/2560/2560'
+$t.AssertEqual(
+    ( Test-Path '.2560/2560/2560/2560/2560' ),
+    $true
+)
 $t.describe( 'Test-Match' )
 
 $t.it( 'shd ret. $false on null $wildcards' )
@@ -132,29 +138,8 @@ $t.it( 'should convert hex to char')
         ( -join $chars ),
         "$([char][byte]'0191') "
     )
-    
-$t.describe( 'Remove-Error' )
 
-$t.it( 'should remove an error' )
-    if( $global:MaximumErrorCount )
-        { $max =
-            $global:MaximumErrorCount }
-    else { $max = 256 } #the default
-    # fill $global:Error with errors
-    $ErrorActionPreference = 
-        'SilentlyContinue'
-    foreach( $k in 1..$max )
-        { $null.ToString() }
-    # call function under test
-    $errCount = Remove-Error
-    # check results
-    $t.ignoreError = $true
-    $t.AssertEqual(
-      $errCount,
-      ( $max - 1 )
-    )
-
-if( $IsLinux )
+if( 'Unix' -eq [Environment]::OSVersion.Platform )
 {
     "Linux attributes section is under construction."
 }

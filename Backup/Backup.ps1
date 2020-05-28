@@ -1,9 +1,9 @@
 <#
 .Synopsis
-Backs up files
+Backs up changed files.
 
 .Description
-Backs up files based on archive bit state and hashtable settings. The hashtable(s) may be kept in a separate .ps1 file or passed in as a parameter.
+Backup.ps1 backs up new and changed files based on hashtable settings. The hashtable(s) may be kept in a separate .ps1 file or passed in as a parameter.
 
 Multiple backup specifications are stored in an array of hashtables.
 
@@ -19,18 +19,21 @@ In-console progress bars show per-spec progress and overall progress. The progre
 Run Get-Help Backup-Updates -Detailed for hashtable syntax, features and examples. Run Get-Help ./Backup.ps1 -Full for full help on this script, including parameters.
 
 .Parameter SpecFile
-A filespec pointing to a file containing the backup specifications, or "specs." The file consists of an array of hashtables assigned to a variable named $specs. The hashtables contain the specifications for what folders and files will be backed up. The file must have the .ps1 extension.
+A filespec pointing to a file containing the backup specifications, or "specs." The file consists of an array of hashtables assigned to a variable named $specs. The hashtables contain the specifications for what folders and files will be backed up.
 
-Either this parameter or the Specs parameter must be specified. Run Get-Help Backup-Updates for hashtable requirements.
+- The file must have the .ps1 extension, and 
+- The array of hashtables must be assigned to the variable $specs.
+
+Either this parameter or the Specs parameter must be specified. Run Get-Help Backup-Updates -Detailed for hashtable requirements.
 
 .Parameter Specs
-An array of hashtables containing backup specifications. Either this parameter or the SpecFile parameter must be specified. Run Get-Help Backup-Updates for hashtable requirements.
+An array of hashtables containing backup specifications. Either this parameter or the SpecFile parameter must be specified. Run Get-Help Backup-Updates -Detailed for hashtable requirements.
 
 .Parameter DontOpenReport
-A boolean that determines whether the report file is opened after the backup operation has completed. Boolean. Optional. Default is $false: By default, the report will open if files were copied or if there were errors.
+A boolean that determines whether the report file is opened after the backup operation has completed. The default is $false: By default, the report will open if files were copied or if there were errors.
 
 .Parameter ShowSpecs
-A boolean that determines whether the hashtable specification(s) are shown on the console. Optional. Default is $false.
+A boolean that determines whether the hashtable specification(s) are shown on the console. The default is $false.
 
 .Parameter Title
 Specifies the title of the output html document and its h1 header contents in the body. Default is Backup report.
@@ -39,7 +42,7 @@ Specifies the title of the output html document and its h1 header contents in th
 Specifies the .css file for formatting the report. Optional. The default is table.css. Optional. The tables may be difficult to read without formatting, but if Setup.ps1 is run, a suitable table.css will be placed in the default log/report folder automatically.
 
 .Parameter LogFolder
-A string specifying the folder in which to keep the backup logs. Default is $env:AppData/PSScripting/logs. Optional. The folder will be created if it does not exist.
+A string specifying the folder in which to keep the backup logs. The default is $home/.local/share/PSBackup/logs. Optional. The folder will be created if it does not exist.
 
 .Parameter Properties
 A hashtable containing the type names and corresponding properties to include in the report file. The default looks something like this:
@@ -70,17 +73,26 @@ A hashtable containing the type names and corresponding properties to include in
             'Exception.ToString()'
         )
     }
-    If an object comes down the pipeline whose type name is not specified in the Properties parameter, except for [string], then the top-level properties returned by Get-Member -MemberType Property will be logged. in general, ErrorRecord objects are sent to the error stream and are not logged. ErrorInfo objects (unique to this project) are sent to the success stream, and so they are also logged.
+
+    If an object in pipeline has a type name that is not specified in the Properties parameter, except for [string], then the top-level properties returned by Get-Member -MemberType Property will be logged. in general, ErrorRecord objects are sent to the error stream and are not logged. ErrorInfo objects are sent to the success stream, and so they are also logged.
     
 .Parameter PassThru
 Determines whether to resend objects down the pipeline. Default is $false. If $true, objects continue down the pipeline as well as being sent to the html file. If PassThru is $true, the progress bar may flicker. Alias: pt.
 
 .Parameter NoFrills
-Simply does the backup. No Html log file is generated. No overall progress is shown. No hashtables are written to the console. Alias: nf.
+Simply does the backup. No Html log file is generated. No overall progress is shown. No hashtables are written to the console. Either the SpecFile parameter or else the Specs parameter will be used to input the backup specifications; other parameters will be ignored. Alias: nf.
+
+.Link
+Get-Help Out-Html [ -Detailed | -Full ]
+
+.Link
+Get-Help about_Backup
+Get-Help about_PSBackup
 #>
 
 using namespace System.Collections
 using namespace System.Text
+using Module ErrorInfo
 #Requires -Module Backup
 
 [CmdletBinding( 
@@ -91,16 +103,22 @@ param(
         ParameterSetName = 'SpecFile',
         Mandatory = $true )]
     [string] $SpecFile,
+
     [parameter( Position = 0,
         ParameterSetName = 'Specs',
         Mandatory = $true )]
     [Hashtable[]] $Specs,
+
     [switch] $DontOpenReport = $false,
+
     [switch] $ShowSpecs = $false,
+
     [string] $Title = "Backup report",
+
     [string] $CssFile = 'table.css',
-    [string] $LogFolder =
-        "$env:AppData/PSScripting/logs",
+
+    [string] $LogFolder = "$home/.local/share/PSBackup/logs",
+
     [Hashtable] $Properties = @{ 
         FileInfo =@(
             'Name'
@@ -127,11 +145,19 @@ param(
             'Exception.ToString()'
         )
     },
+
     [alias( 'pt' )]
     [switch] $PassThru = $false,
+
     [alias( 'nf' )]
-    [switch] $NoFrills = $false )
-# end parameters
+    [switch] $NoFrills = $false
+)
+# check platform
+if( -Not 'Win32NT' -eq [Environment]::OSVersion.Platform )
+{
+    "Only Windows is supported at this time. Linux support is scheduled for fall 2020."
+    Exit
+}
 
 # basic definitions
 $silent = @{ ErrorAction = 'SilentlyContinue' }
@@ -167,8 +193,12 @@ $scriptBaseName = Get-ScriptBaseName
 $friendlyDatestamp = Get-Datestamp
 $datestamp = Get-Datestamp -ForFileName
 $fileName = "$scriptBaseName-$datestamp.htm"
-$outfile = "$logFolder/$fileName"
-New-Folder $logFolder
+if( $null -eq $LogFolder )
+{
+    $LogFolder = "$env:AppData\PSBackup\logs"
+}
+$outfile = "$LogFolder/$fileName"
+New-Folder $LogFolder
 $reportFileArgs = @{
     OutFile = $outfile
     Title = $title
@@ -180,7 +210,7 @@ $reportFileArgs = @{
     Properties = $Properties
     PassThru = $PassThru
 }
-$fc = @{ Count = -1 } # object/file count
+$oc = @{ Count = 0; CountByType = @{} } # object/file count
     
 function Convert-SpecToString( $spec, $keys, $sb ) {
     $sb.Append( "`n@{" ) > $null
@@ -242,7 +272,7 @@ if( $ShowSpecs )
                'Include', 'Exclude'
                'Subfolders', 'Force'
                'VersionsOnSrc', 'VersionsOnDest' )
-    $sb = [StringBuilder]::new()
+    $sb = [System.Text.StringBuilder]::new()
     foreach( $spec in $specs )
     {
         Convert-SpecToString $spec $keys $sb
@@ -267,7 +297,22 @@ $specs | ForEach-Object -Begin {
         # pass specfile to module for possible error message
         $_.SpecFile = $SpecFile
     }
-    Backup-Updates $_ @stopOnErr
+
+    # Save spec info for the error message, because after error, $_ will represent the [ErrorRecord].
+    $spec = $_ 
+
+    try { Backup-Updates $_ @stopOnErr }
+
+    catch
+    {
+        [ErrorInfo]::new( $_ )
+        "Error context: Spec name: '$($spec.Name)'; Spec source folder: '$($spec.Src)'."
+        "Script stack trace: $($_.ScriptStackTrace)"
+        if( -Not $null -eq $spec.FileInfo )
+        {
+            "File: $($spec.FileInfo.FullName)"
+        }
+    }
     $i++
 
 } -End {
@@ -278,20 +323,20 @@ $specs | ForEach-Object -Begin {
     Write-Progress @progressArgs
     Start-Sleep -Seconds 3
 
-} | Measure-PipedObjects -Counter $fc |
+} | Measure-PipedObjects -Counter $oc |
     Out-Html @reportFileArgs
 
-if ( -Not $fc.Count ) {
+if ( 0 -eq $oc.Count ) {
 
-    # don't keep file without contents
-    $errorArg = @{ 
-        ErrorAction = 'SilentlyContinue' }
-    Remove-Item $outfile @errorArg
+    "$(Get-ScriptName): No files were backed up and no errors occurred."
+    # remove the header-only report file
+    $silent = @{ ErrorAction = 'SilentlyContinue' }
+    Remove-Item $outfile @silent
 
 } elseif( -Not $DontOpenReport ) {
 
     "`nObjects counted by type:"
-    $fc.CountByType
-    
+    $oc.CountByType
+    # open the report file
     Invoke-Item $outfile
 }
