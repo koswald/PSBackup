@@ -1,0 +1,41 @@
+﻿
+
+About the ErrorRemover module and class
+
+
+SHORT DESCRIPTION
+
+Provides an aid to error handling.
+
+LONG DESCRIPTION
+
+The ErrorRemover class provides a method that enables reliably catching an error by watching the Count property of the $global:Error automatic variable. 
+
+The $global:Error variable is a System.Collections.ArrayList containing the most recent ErrorRecord objects, and it typically has a capacity of 256 objects. If the variable is at capacity, watching the Count property will not indicate whether an error has occurred, unless...
+
+Calling the RemoveError method of the ErrorRemover object removes the oldest ErrorRecord from the $global:Error variable, if it is at capacity. Also, it returns the Count property value.
+
+EXAMPLES
+
+using Module ErrorRemover # at the top of the .ps1/.psm1 file
+
+$remover = [ErrorRemover]::new()
+$beginningCount = $remover.RemoveError()
+
+$item = Get-Item './none.such.item' -EA 'SilentlyContinue'
+
+if( $global:Error.Count -gt $beginningCount )
+{
+
+    $errorRecord = $global:Error[0]
+    "Error type    : $($errorRecord.Exception.GetType().FullName)"
+    "Error message : $($errorRecord.Exception.Message)"
+}
+
+KEYWORDS
+
+Error, Error handling, 
+
+SEE ALSO
+
+Get-Help ./IntegrationTests/Test_Pattern_ErrorHandling.ps1

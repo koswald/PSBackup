@@ -1,0 +1,45 @@
+﻿
+
+About the PSBackup project
+
+
+SHORT DESCRIPTION
+
+Provides backup features.
+
+LONG DESCRIPTION
+
+The PSBackup project provides a PowerShell script and supporting modules and documentation to perform multiple customized folder backups.
+
+EXAMPLE
+
+# Setup the project
+./Setup.ps1
+
+EXAMPLE
+
+#Requires -Module Backup
+
+# Backup a folder
+$specs = @(
+    @{
+        Name = "My PowerShell scripts"
+        Src = "$home/Documents/PowerShell"
+        Dest = "$home/Backups/MyPSScripts"
+        Include = "*.ps*", "*.md", "*.txt"
+        Subfolders = $true
+    }
+)
+$specs | Backup-Updates 
+
+KEYWORDS
+
+Backup, PowerShell
+
+SEE ALSO
+
+ReadMe.md
+Get-Help Backup-Updates [ -Detailed | -Full ]
+Get-Help ./Backup/Backup.ps1 [ -Detailed | -Full ]
+Get-Help about_Backup
+Backup/BackupTask.md

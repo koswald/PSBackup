@@ -1,5 +1,7 @@
 # Creating a Backup Task
 
+The following are steps and *suggested* settings for creating a new backup task in the Task Scheduler.
+
 - Copy `SpecFile1.ps1` from the `Backup` folder to a new location and customize it to suit your backup requirements.
 
 - Copy `BackupTask.vbs` from the `Backup` folder to a new location and customize the `common2` variable to reflect the correct, absolute file locations for `Backup.ps1` and `SpecFile1.ps1`.
@@ -16,7 +18,7 @@
   - *At log in*.
   - *Specific user*.
   - Delay task for *10 minutes*.
-  - Repeat task every *10 minutes*.
+  - Repeat task every *1 hour*.
   - ... for a duration of *indefinitely*.
   - *Enabled* should be checked.
   - Click *OK* to save changes.
@@ -28,7 +30,7 @@
   - In the *Add arguments* field, type the path to your customized `BackupTask.vbs`, including the filename. Surround it in quotes if there are spaces in the path, or if you are unsure. Example:
 
   ```
-  "$env:Project42/Backup/BackupTask.vbs"
+  "$env:PSBackup/Backup/BackupTask.vbs"
   ```
 
   - Click *OK* to save changes.

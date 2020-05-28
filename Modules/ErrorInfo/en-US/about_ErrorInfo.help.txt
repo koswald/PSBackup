@@ -1,0 +1,40 @@
+﻿
+
+About the ErrorInfo module and class
+
+
+SHORT DESCRIPTION
+
+Gleans from an ErrorRecord object.
+
+LONG DESCRIPTION
+
+ErrorInfo is a PowerShell class intended to provide an easy way to send selected error information down the success pipeline so that it can be included in the report file.
+
+One constructor accepts an ErrorRecord object. The other constructor accepts an ErrorRecord object and a message string for adding context.
+
+Field values derive from a [System.Management.Automation.ErrorRecord] instance, shown below as $er:
+
+Message: $er.Exception.Message
+ScriptName: [System.IO.Path]::GetFileName( $er.InvocationInfo.ScriptName ) ==> the path is stripped: just the filename and extension are included.
+LineNumber: $er.InvocationInfo.ScriptLineNumber ==> the line number in the script where the error occurred.
+ExceptionName: $er.Exception.GetType().Name.
+ExceptionFullName: $er.Exception.GetType().FullName.
+
+EXAMPLES
+
+using Module ErrorInfo # place at the top of the .ps1/.psm1
+
+try { Get-Item './No such file.txt' -EA 'Stop' }
+catch {
+    [ErrorInfo]::new( $_, $contextMessageString )
+}
+
+KEYWORDS
+
+Error, Error handling.
+
+SEE ALSO
+
+Get-Help Backup-Updates -Detailed   < note the parameter named "Properies" >
+./IntegrationTests/Test_Pattern_ErrorHandling.ps1

@@ -1,0 +1,38 @@
+﻿
+
+About the Backup module
+
+
+SHORT DESCRIPTION
+
+Provides backup features.
+
+LONG DESCRIPTION
+
+The Backup module provides the backup features used in Backup.ps1.
+
+EXAMPLE
+
+#Requires -Module Backup
+
+$specs = @(
+    @{
+        Name = "My PowerShell scripts"
+        Src = "$home/PowerShell"
+        Dest = "$home/Backups/MyPSScripts"
+        Include = "*.ps*", "*.md", "*.txt"
+        Subfolders = $true
+    }
+)
+$specs | Backup-Updates 
+
+KEYWORDS
+
+Backup, PowerShell
+
+SEE ALSO
+
+ReadMe.md
+Get-Help Backup-Updates [ -Detailed | -Full ]
+Get-Help .\Backup\Backup.ps1 [ -Detailed | -Full ]
+Backup\BackupTask.md

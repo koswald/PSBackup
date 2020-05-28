@@ -1,0 +1,40 @@
+﻿
+
+About the Utility module
+
+
+SHORT DESCRIPTION
+
+Provides PowerShell utilities.
+
+LONG DESCRIPTION
+
+The Utility module provides utilities that support the Backup module and Backup.ps1.
+
+To get a list of the commands, type Get-Command -Module Utility.
+
+EXAMPLE
+
+#Requires -Module Utility
+
+Get-ChildItem | Out-Html -Properties @{
+    FileInfo = @(
+        'Name'
+        'Length'
+    )
+    DirectoryInfo = @(
+        'Name'
+        'CreationTime'
+    )
+}
+
+
+KEYWORDS
+
+Backup, PowerShell
+
+SEE ALSO
+
+Get-Command -Module Utility
+Get-Help Out-Html
+ReadMe.md

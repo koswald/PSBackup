@@ -1,0 +1,84 @@
+﻿
+
+About the IntegrationTester module and class
+
+
+SHORT DESCRIPTION
+
+Provides testing features.
+
+LONG DESCRIPTION
+
+The IntegrationTester module consists of a PowerShell class that provides an ultra-light integration testing framework.
+
+IntegrationTester main methods:
+
+Describe
+Accepts the name of the unit under test.
+
+It
+Accepts a specification description, 'should copy a file', for example. An error received between the 'it' method call and the assertion statement is shown in the Err field of the output object. 
+
+AssertEqual
+Accepts and compares a pair of [int], [bool], or [string] values. Returns a results object.
+
+AssertErrorMessage
+Accepts a string with wildcards and compares it to the actual error's message. The assertion fails if there is no error or the message is not -like the expected message. Returns a results object.
+
+For each specification, or spec, the assertion statement returns a PSCustomObject with Result, Unit, Spec, Actual, Expected, Err, Host, and Version properties.
+
+EXAMPLE
+
+using Module IntegrationTester
+
+function Test-Me( $x, $y )
+{
+    return $x + $y
+}
+
+$t = [IntegrationTester]::new()
+
+$t.describe( 'Test-Me' )
+$t.it( 'should add' )
+$t.AssertEqual(
+    ( Test-Me 1 1 ),
+    2
+)
+
+OUTPUT
+
+Result   : pass
+Unit     : Test-Me
+Spec     : should add
+Actual   : 2
+Expected : 2
+Err      :
+Host     : pwsh
+Version  : 7.0.1
+
+
+EXAMPLE
+
+# save test output objects to a variable
+$results = ./Test_Module_Backup.ps1
+
+EXAMPLE
+
+# may require maximized console window
+$results | Format-Table
+
+EXAMPLE
+
+# just show fails and errors
+$results | Where-Object {
+    'fail' -eq $_.Result -or
+    'error' -eq $_.Result
+}
+
+KEYWORDS
+
+integration, test
+
+SEE ALSO
+
+./IntegrationTests/Test_*.ps1
