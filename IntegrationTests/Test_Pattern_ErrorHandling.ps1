@@ -49,7 +49,7 @@ $t.describe( 'DP2: ErrorVariable (EV)')
                  ErrorAction = 'SilentlyContinue'
                  ErrorVariable = 'er'}
     Get-Item @giArgs
-    if( -Not $null -eq $er )
+    if( -Not ( $null -eq $er ))
     {
         $e = $er[0]
     }
@@ -97,7 +97,7 @@ $t.describe( 'DP4: EV, advanced function' )
                 ErrorVariable = 'er' }
     Get-NoSuchItem @GnsiArgs | Out-Null
     
-    if( -Not $null -eq $er )
+    if( -Not ( $null -eq $er ))
     {
         $err = $er[0]
     }

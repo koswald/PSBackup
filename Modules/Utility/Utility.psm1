@@ -13,7 +13,7 @@ function Set-ArchiveBit
         [parameter()]
         [object] $File )
 
-    if ( -Not $File.FullName )
+    if ( $null -eq $File.FullName )
     {
         # convert [string] to [FileInfo]
         $File = Get-Item $File
@@ -33,7 +33,7 @@ function Clear-ArchiveBit
     param(
         [parameter()] [object] $file )
         
-    if ( -Not ( $file.fullName ))
+    if ( $null -eq $file.fullName )
     {
         # convert [string] to [FileInfo]
          $file = Get-Item $file
@@ -246,7 +246,7 @@ function Measure-PipedObjects
     {
         $Object #return object to the pipeline
         $Counter.Count++
-        $type = $Object.GetType().Name
+        $type = $Object.GetType().FullName
         if( -Not $cbt.ContainsKey( $type ))
         {
             $cbt.Add( $type, 0 )
@@ -432,7 +432,7 @@ function Out-Html
         {
             $props = @( 'String' )
         }
-        elseif( -Not $null -eq $Properties -And
+        elseif( -Not ( $null -eq $Properties ) -And
             $Properties.ContainsKey( $type ))
         {
             # use only the specified properties

@@ -154,6 +154,7 @@ function Optimize-Percent( [Single] $x )
     .Synopsis
     Validate Write-Progress -PercentComplete
     #> 
+
     if( $x -lt 0 )
     {
         return 0
@@ -169,13 +170,17 @@ function Optimize-Percent( [Single] $x )
 }
 
 function Get-BackupFiles
-{    <#
+{
+    <#
     .Synopsis
     Returns the files to backup.
+
     .Description
     Returns the files to backup for one hashtable/spec.
+
     .Parameter Spec
     For hashtable requirements, see Get-Help Backup-Updates -Detailed.
+
     .Notes
     For internal use. Exported for testing.
     The validation function Optimize-SpecData is called before this one.
@@ -257,16 +262,13 @@ function Get-BackupFiles
 
 function Get-CommonBackupPath
 {
-    param( [parameter( Mandatory = $true )]
-           [Hashtable] $Spec )
-
-    return $Spec.File.DirectoryName.Substring( $Spec.Src.Length )
-
     <#
     .Description
     Gets the string common to source and destination, minus the trailing \, but including the leading \.
+
     .Parameter Spec
     The backup spec [Hashtable] $Spec with the source file's [FileInfo] object added as the File value.
+
     .Example
     # in function Backup-Updates
     $Src = $file.DirectoryName
@@ -275,13 +277,27 @@ function Get-CommonBackupPath
         $Spec.Dest
         ( Get-CommonBackupPath $Spec )
     )
+
     .Notes
     Exported for testing only.
     #>
+    
+    param( [parameter( Mandatory = $true )]
+           [Hashtable] $Spec )
+
+    return $Spec.File.DirectoryName.Substring( $Spec.Src.Length )
 }
 
 function Optimize-SpecData
 {
+    <#
+    .Synopsis
+    Validate, expand, count, initialize
+
+    .Notes
+    Exported for testing only.
+    #>
+    
     param(
         [parameter( Mandatory = $true )]
         [Hashtable] $SpecSheet )
@@ -301,11 +317,11 @@ function Optimize-SpecData
 
     # set default values
     
-    if($null -eq $ss.Name )
+    if( $null -eq $ss.Name )
     {
         $ss.Name = 'Name not specified'
     }
-    if( -Not $null -eq $ss.Filter )
+    if( -Not ( $null -eq $ss.Filter ))
     {
         # throw error
         $ss.OptimizeError = $true
@@ -428,13 +444,6 @@ function Optimize-SpecData
         [ErrorInfo]::new( $errorRecord, $message )
     }
     $BackupSpy.OptimizeCalls++
-
-<#
-.Synopsis
-Validate, expand, count, initialize
-.Notes
-Exported for testing only.
-#>
 }
 
 function Backup-Updates
@@ -474,7 +483,7 @@ function Backup-Updates
                 ErrorVariable = $er }
         $files = Get-BackupFiles @gbfArgs
 
-        if ( -Not $null -eq $er )
+        if ( -Not ( $null -eq $er ))
         {
             # ErrorRecord obj => error stream
             $PSCmdlet.WriteError( $er[0] )
@@ -555,7 +564,7 @@ function Backup-Updates
                 $unforseenError = $_
             }
 
-            if( -Not $null -eq $unforseenError )
+            if( -Not ( $null -eq $unforseenError ))
             {
                 # rethrow unforseenError
                 $PSCmdlet.WriteError( $unforseenError )

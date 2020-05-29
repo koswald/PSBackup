@@ -153,7 +153,7 @@ param(
     [switch] $NoFrills = $false
 )
 # check platform
-if( -Not 'Win32NT' -eq [Environment]::OSVersion.Platform )
+if( -Not ( 'Win32NT' -eq [Environment]::OSVersion.Platform ))
 {
     "Only Windows is supported at this time. Linux support is scheduled for fall 2020."
     Exit
@@ -308,7 +308,7 @@ $specs | ForEach-Object -Begin {
         [ErrorInfo]::new( $_ )
         "Error context: Spec name: '$($spec.Name)'; Spec source folder: '$($spec.Src)'."
         "Script stack trace: $($_.ScriptStackTrace)"
-        if( -Not $null -eq $spec.FileInfo )
+        if( -Not ( $null -eq $spec.FileInfo ))
         {
             "File: $($spec.FileInfo.FullName)"
         }

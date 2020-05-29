@@ -5,7 +5,7 @@ About the ErrorInfo module and class
 
 SHORT DESCRIPTION
 
-Gleans from an ErrorRecord object.
+Provides selected error information.
 
 LONG DESCRIPTION
 

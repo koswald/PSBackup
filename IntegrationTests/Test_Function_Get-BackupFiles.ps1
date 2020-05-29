@@ -103,7 +103,7 @@ function Get-NameString
     {
         $str += "|$($file)"
     }
-    if( -Not [string]::Empty -eq $str )
+    if( -Not ( [string]::Empty -eq $str ))
     {
         # remove leading delimiter
         $str = $str.Substring( 1 )
