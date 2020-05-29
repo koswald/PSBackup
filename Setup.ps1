@@ -35,8 +35,7 @@ if( 'Win32NT' -eq [Environment]::OSVersion.Platform ) {
     $delimiter = ':'
     $separator = '/'
 }
-$PSCommandPath | Split-Path | Set-Location
-$ProjectModulePath = "$PWD$($separator)Modules"
+$ProjectModulePath = "$PSScriptRoot$($separator)Modules"
 
 # check whether the project module path has already been added
 
