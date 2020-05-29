@@ -3,7 +3,7 @@
 [Requirements]( #requirements )
 
 [Features]( #project-features)  
-- [Backup script]( #backup.ps1-script )  
+- [Backup script]( #backup-script )  
 - [Backup-Updates command]( #backup-updates-command )  
 - [Out-Html command]( #out-html-command )
 - [Backup module]( #backup-module )  
@@ -26,19 +26,19 @@ The PSBackup project was tested with PowerShell Core 6 and 7, and Windows PowerS
 
 # Project features
 
-## Backup.ps1 script
+## Backup script
 
 Backs up new and changed files. Any objects sent down the pipeline including files copied, message strings, and ErrorInfo objects are logged to an html file by default. The object properties that are logged are customizable.
 
 For help on this script, type
 
 ```PowerShell
-Get-Help ./Backup.ps1 -Full
+Get-Help ./Backup/Backup.ps1 -Full
 ```
 
 ## Backup-Updates command
 
-Backs up changed files based on archive bit state. Backup specifications are grouped in hashtables. Multiple hashtables can be piped to the command. Supports versions and provides a console progress bar. This is the function that [Backup.ps1]( #backup.ps1-script) is based on.
+Backs up changed files based on archive bit state. Backup specifications are grouped in hashtables. Multiple hashtables can be piped to the command. Supports versions and provides a console progress bar. This is the function that [Backup.ps1]( ./Backup/Backup.ps1 ) is based on.
 
 For help on this command, type
 
@@ -126,7 +126,7 @@ Get-Help Backup-Updates [ -Detailed | -Full ]
 Get-Help ./Backup/Backup.ps1 [ -Detailed | -Full ]  
 Get-Help about_PSBackup  
 Get-Help about_Backup  
-Backup/BackupTask.md  
+./Backup/[BackupTask.md]  
 
 # Links
 
@@ -145,6 +145,8 @@ Backup/BackupTask.md
 For the hidden Init pattern used in the ErrorInfo class to simulate one constructor calling another constructor, credit goes to https://stackoverflow.com/questions/44413206/constructor-chaining-in-powershell-call-other-constructors-in-the-same-class.
 
 ---
+
+[BackupTask.md]: ./Backup/BackupTask.md
 
 [PowerShell Scripting]: https://docs.microsoft.com/en-us/powershell/scripting/PowerShell-Scripting "https://docs.microsoft.com"
 
