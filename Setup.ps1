@@ -27,7 +27,7 @@ param(
     [string]
     $ProfileName = 'CurrentUserAllHosts', 
 
-    [switch] $Confirm
+    [switch] $Confirm = $false
 )
 # build the project Module path
 

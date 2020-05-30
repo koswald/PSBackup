@@ -564,7 +564,7 @@ function Backup-Updates
                 $unforseenError = $_
             }
 
-            if( -Not ( $null -eq $unforseenError ))
+            if( $null -ne $unforseenError)
             {
                 # rethrow unforseenError
                 $PSCmdlet.WriteError( $unforseenError )

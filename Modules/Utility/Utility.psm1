@@ -432,7 +432,7 @@ function Out-Html
         {
             $props = @( 'String' )
         }
-        elseif( -Not ( $null -eq $Properties ) -And
+        elseif( $null -ne $Properties -And
             $Properties.ContainsKey( $type ))
         {
             # use only the specified properties
