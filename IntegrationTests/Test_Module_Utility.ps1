@@ -141,7 +141,7 @@ $t.it( 'should convert hex to char')
 
 if( 'Unix' -eq [Environment]::OSVersion.Platform )
 {
-    "Linux attributes section is under construction."
+    "Xnix attributes section is under construction."
 }
 
 $t.describe( 'Clear-ArchiveBit' )

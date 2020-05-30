@@ -22,7 +22,7 @@
 - PowerShell 5 or higher  
 - Windows &trade;
 
-The PSBackup project was tested with PowerShell Core 6 and 7, and Windows PowerShell 5.1. A Linux port is in the works, but the project will not work with macOS or Linux at this time.
+The PSBackup project was tested with Windows PowerShell 5.1 and PowerShell Core 6 and 7.
 
 # Project features
 
@@ -97,18 +97,23 @@ See [Writing Help for PowerShell Modules].
 
 ## Integration tests
 
-The tests can be run as a whole by running `suite.ps1` in the IntegrationTests folder. The testing "framework" consists of a [class](Modules/IntegrationTester/IntegrationTester.psm1) written in PowerShell.
+The tests can be run as a whole by running `suite.ps1` in the `IntegrationTests` folder. The ultra-light testing framework consists of a [ class ]( Modules/IntegrationTester/IntegrationTester.psm1 ) written in PowerShell.
 
 # Setup
 
-`Setup.ps1` adds the project path to the profile file $profile.CurrentUserAllHosts.
+`Setup.ps1` adds the project path to a profile file.
 
 ```PowerShell
-Set-Location <project-path>
 ./Setup.ps1
 ```
 
-Restart the console window for changes to take effect. 
+By default, the CurrentUserAllHosts profile file is used, typically `$home\Documents\WindowsPowerShell\profile.ps1` for version 5, and `$home\Documents\PowerShell\profile.ps1` for versions 6 and higher. The file and path will be created if they do not exist. In order to use another profile, type
+
+``` PowerShell
+.\Setup.ps1 -ProfileName  # with a space after -ProfileName
+```
+
+and press Tab to get the desired profile. If you want to use one of the AllUsers... profiles, you must use a console with elevated privileges. Use `-Confirm` to if you want to require confirmation, and restart the console window for changes to take effect. 
 
 # Notes
 

@@ -155,7 +155,7 @@ param(
 # check platform
 if( -Not ( 'Win32NT' -eq [Environment]::OSVersion.Platform ))
 {
-    "Only Windows is supported at this time. Linux support is scheduled for fall 2020."
+    "Only Windows is supported at this time."
     Exit
 }
 
