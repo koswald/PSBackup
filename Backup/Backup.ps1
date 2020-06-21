@@ -84,9 +84,9 @@ Simply does the backup. No Html log file is generated. No overall progress is sh
 
 .Link
 Get-Help Out-Html [ -Detailed | -Full ]
-
 .Link
 Get-Help about_Backup
+.Link
 Get-Help about_PSBackup
 #>
 
@@ -153,6 +153,7 @@ param(
     [switch] $NoFrills = $false
 )
 # check platform
+
 if( -Not ( 'Win32NT' -eq [Environment]::OSVersion.Platform ))
 {
     "Only Windows is supported at this time."
@@ -160,12 +161,14 @@ if( -Not ( 'Win32NT' -eq [Environment]::OSVersion.Platform ))
 }
 
 # basic definitions
+
 $silent = @{ ErrorAction = 'SilentlyContinue' }
 $scriptName = Get-ScriptName
 
 if( 'SpecFile' -eq $PSCmdlet.ParameterSetName )
 {
     # check for missing spec file
+
     if( -Not ( Test-Path $SpecFile @silent ))
     {
         "`$PWD = $PWD"
@@ -177,6 +180,7 @@ if( 'SpecFile' -eq $PSCmdlet.ParameterSetName )
         )
     }
     # load backup specifications from file
+
     . ( Get-Item $SpecFile ).FullName
 }
 
@@ -188,7 +192,8 @@ if ( $NoFrills )
     exit
 }
 
-# prep log/report file
+# prepare the report file
+
 $scriptBaseName = Get-ScriptBaseName
 $friendlyDatestamp = Get-Datestamp
 $datestamp = Get-Datestamp -ForFileName
@@ -199,6 +204,7 @@ if( $null -eq $LogFolder )
 }
 $outfile = "$LogFolder/$fileName"
 New-Folder $LogFolder
+Copy-Item -Path $PSScriptRoot/$CssFile -Destination $LogFolder
 $reportFileArgs = @{
     OutFile = $outfile
     Title = $title
@@ -235,18 +241,19 @@ function Convert-ArrayToString( $name, $objects, $sb )
 {
     $sb.Append(( "`n    $name = @( " )) > $null
     $i = 1
-    foreach( $object in $objects ) {
+    foreach( $object in $objects )
+    {
         if( 'string' -like $object.GetType() )
         {
             # object is a string
+
             $sb.Append( "`"$object`"" ) > $null
             if( $i -eq $objects.Count )
                 { $sb.Append( ' ' ) > $null }
             else { $sb.Append( ', ' ) > $null }
         }
-        else 
+        else # object is assumed to be a hashtable
         {
-            # object is assumed to be a hashtable
             $sb.Append( "@{ " ) > $null
             $j = 1
             foreach( $key in $object.keys )
@@ -268,6 +275,7 @@ function Convert-ArrayToString( $name, $objects, $sb )
 if( $ShowSpecs )
 {
     # display specsheet hashtables with keys listed in this order:
+
     $keys = @( 'Name', 'Src', 'Dest'
                'Include', 'Exclude'
                'Subfolders', 'Force'
