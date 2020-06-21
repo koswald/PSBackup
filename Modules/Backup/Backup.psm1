@@ -697,11 +697,11 @@ function Test-Versions
     foreach( $version in $Versions ) {
 
         if( $File.Name -Like $version.Include ) {
-            $args = @{ Version = $version
+            $versionArgs = @{ Version = $version
                        File = $File 
                        ErrorAction = 'Stop' }
-            Backup-Version @args
-            Remove-ExcessVersions @args
+            Backup-Version @versionArgs
+            Remove-ExcessVersions @versionArgs
         }
     }
 }
