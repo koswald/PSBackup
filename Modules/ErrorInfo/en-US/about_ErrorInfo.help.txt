@@ -15,11 +15,13 @@ One constructor accepts an ErrorRecord object. The other constructor accepts an 
 
 Field values derive from a [System.Management.Automation.ErrorRecord] instance, shown below as $er:
 
-Message: $er.Exception.Message
-ScriptName: [System.IO.Path]::GetFileName( $er.InvocationInfo.ScriptName ) ==> the path is stripped: just the filename and extension are included.
-LineNumber: $er.InvocationInfo.ScriptLineNumber ==> the line number in the script where the error occurred.
-ExceptionName: $er.Exception.GetType().Name.
-ExceptionFullName: $er.Exception.GetType().FullName.
+Message           : $er.Exception.Message
+ScriptName        : The filename and the extension; no path information:
+                    [System.IO.Path]::GetFileName( $er.InvocationInfo.ScriptName )
+LineNumber        : The line number in the script where the error occurred:
+                    $er.InvocationInfo.ScriptLineNumber
+ExceptionName     : $er.Exception.GetType().Name
+ExceptionFullName : $er.Exception.GetType().FullName
 
 EXAMPLES
 
