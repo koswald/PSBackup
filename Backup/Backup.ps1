@@ -39,10 +39,7 @@ A boolean that determines whether the hashtable specification(s) are shown on th
 Specifies the title of the output html document and its h1 header contents in the body. Default is Backup report.
 
 .Parameter CssFile
-Specifies the .css file for formatting the report. Optional. The default is table.css. Optional. The tables may be difficult to read without formatting, but if Setup.ps1 is run, a suitable table.css will be placed in the default log/report folder automatically.
-
-.Parameter LogFolder
-A string specifying the folder in which to keep the backup logs. The default is $home/.local/share/PSBackup/logs. Optional. The folder will be created if it does not exist.
+Specifies the .css file for formatting the report. Optional. The default is table.css. The tables may be difficult to read without formatting, but if Setup.ps1 is run, a suitable table.css will be placed in the default log/report folder automatically.
 
 .Parameter Properties
 A hashtable containing the type names and corresponding properties to include in the report file. The default looks something like this:
@@ -117,8 +114,6 @@ param(
 
     [string] $CssFile = 'table.css',
 
-    [string] $LogFolder = "$home/.local/share/PSBackup/logs",
-
     [Hashtable] $Properties = @{ 
         FileInfo =@(
             'Name'
@@ -154,8 +149,13 @@ param(
 )
 # check platform
 
-if( -Not ( 'Win32NT' -eq [Environment]::OSVersion.Platform ))
+if( 'Win32NT' -eq [Environment]::OSVersion.Platform )
 {
+    $LogFolder = "$env:AppData\PSBackup\logs"
+}
+else
+{
+    $LogFolder = "$home/.local/share/PSBackup/logs"
     "Only Windows is supported at this time."
     Exit
 }
@@ -198,13 +198,12 @@ $scriptBaseName = Get-ScriptBaseName
 $friendlyDatestamp = Get-Datestamp
 $datestamp = Get-Datestamp -ForFileName
 $fileName = "$scriptBaseName-$datestamp.htm"
-if( $null -eq $LogFolder )
-{
-    $LogFolder = "$env:AppData\PSBackup\logs"
-}
 $outfile = "$LogFolder/$fileName"
 New-Folder $LogFolder
-Copy-Item -Path $PSScriptRoot/$CssFile -Destination $LogFolder
+if( -Not ( Test-Path $LogFolder/$CssFile ))
+{
+    Copy-Item -Path $PSScriptRoot/$CssFile -Destination $LogFolder
+}
 $reportFileArgs = @{
     OutFile = $outfile
     Title = $title
