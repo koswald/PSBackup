@@ -3,11 +3,11 @@ using namespace System.Collections
 function Set-ArchiveBit
 {
     <#
-    .Synopsis
-    Sets the archive bit on a file.
-    
-    .Description
-    Sets the archive bit on a file. The file may be either a relative path [string], a full path [string], or a [System.IO.FileInfo] object returned by the Get-Item cmdlet, as in Get-Item "./MyFile.txt".
+        .Synopsis
+        Sets the archive bit on a file.
+
+        .Description
+        Sets the archive bit on a file. The file may be either a relative path [string], a full path [string], or a [System.IO.FileInfo] object returned by the Get-Item cmdlet, as in Get-Item ".\MyFile.txt".
     #>
     param(
         [parameter()]
@@ -24,11 +24,11 @@ function Set-ArchiveBit
 function Clear-ArchiveBit
 {
     <#
-    .Synopsis
-    Clears the archive bit on a file.
-    
-    .Description
-    Clears the archive bit on a file. The file may be either a relative path [string], a full path [string], or a [System.IO.FileInfo] object returned by the Get-Item cmdlet, as in Get-Item "./MyFile.txt".
+        .Synopsis
+        Clears the archive bit on a file.
+        
+        .Description
+        Clears the archive bit on a file. The file may be either a relative path [string], a full path [string], or a [System.IO.FileInfo] object returned by the Get-Item cmdlet, as in Get-Item ".\MyFile.txt".
     #>
     param(
         [parameter()] [object] $file )
@@ -44,11 +44,11 @@ function Clear-ArchiveBit
 function New-Folder
 {
     <#
-    .Synopsis
-    Creates a directory.
-    
-    .Description
-    The New-Folder command creates a new folder and, if necessary, the parent folders too.
+        .Synopsis
+        Creates a directory.
+        
+        .Description
+        The New-Folder command creates a new folder and, if necessary, the parent folders too.
     #>
     param(
          [parameter( Mandatory = $true )]
@@ -69,17 +69,17 @@ function New-Folder
 function Test-Match
 {
     <#
-    .Synopsis
-    Tests for a match.
+        .Synopsis
+        Tests for a match.
 
-    .Description
-    Tests a string for a match against an array of wildcards.
+        .Description
+        Tests a string for a match against an array of wildcards.
 
-    .Parameter TestString
-    A [string] to compare with the wildcard array.
+        .Parameter TestString
+        A [string] to compare with the wildcard array.
 
-    .Parameter Wildcards
-    An array of wildcard strings ( [string[]] ). If the test string is like any of the wildcards, then $true is returned. Otherwise, $false is returned. If Wildcards is not specified, then $false is returned.
+        .Parameter Wildcards
+        An array of wildcard strings ( [string[]] ). If the test string is like any of the wildcards, then $true is returned. Otherwise, $false is returned. If Wildcards is not specified, then $false is returned.
     #>
     param(
         [parameter( Mandatory = $true )]
@@ -106,11 +106,11 @@ function Test-Match
 function Get-Datestamp
 {
     <#
-    .Synopsis
-    Get a datestamp for "now".
-    
-    .Parameter ForFileName
-    Set to $true to get a datestamp suitable for a filename. Default is $false.
+        .Synopsis
+        Get a datestamp for "now".
+        
+        .Parameter ForFileName
+        Set to $true to get a datestamp suitable for a filename. Default is $false.
     #>
     param(
         [Parameter()]
@@ -130,14 +130,14 @@ function Get-Datestamp
 function Get-FileName
 {
     <#
-    .Synopsis
-    Gets a filename.
-    
-    .Description
-    The Get-FileName command gets the filename from a path, including the extension.
-    
-    .Example
-    Get-FileName 'C:\file.ext' # file.ext
+        .Synopsis
+        Gets a filename.
+        
+        .Description
+        The Get-FileName command gets the filename from a path, including the extension.
+        
+        .Example
+        Get-FileName 'C:\file.ext' # file.ext
     #>
     param(
         [parameter( Mandatory = $true )]
@@ -149,14 +149,14 @@ function Get-FileName
 function Get-FileBaseName
 {
     <#
-    .Synopsis
-    Gets a  file's base name.
-    
-    .Description
-    The Get-FileBaseName command gets the filename from a path, excluding the extension.
-    
-    .Example
-    Get-FileBaseName 'C:\file.ext' # file
+        .Synopsis
+        Gets a  file's base name.
+        
+        .Description
+        The Get-FileBaseName command gets the filename from a path, excluding the extension.
+        
+        .Example
+        Get-FileBaseName 'C:\file.ext' # file
     #>
     param(
         [parameter( Mandatory = $true )]
@@ -176,8 +176,8 @@ function Get-FileBaseName
 function Get-ScriptName
 {
     <#
-    .Description
-    Gets the name of the calling script, including the extension.
+        .Description
+        Gets the name of the calling script, including the extension.
     #>
     $path = @{ 
         Path = $MyInvocation.ScriptName }
@@ -187,8 +187,8 @@ function Get-ScriptName
 function Get-ScriptFullName
 {
     <#
-    .Description
-    Gets the full name of the calling script, including the path.
+        .Description
+        Gets the full name of the calling script, including the path.
     #>
     return $MyInvocation.ScriptName
 }
@@ -196,8 +196,8 @@ function Get-ScriptFullName
 function Get-ScriptBaseName
 {
     <#
-    .Description
-    Gets the name of the calling script, excluding the extension.
+        .Description
+        Gets the name of the calling script, excluding the extension.
     #>
     $path = @{ Path = $MyInvocation.ScriptName }
     return Get-FileBaseName @path
@@ -206,33 +206,33 @@ function Get-ScriptBaseName
 function Measure-PipedObjects
 {
     <#
-    .Synopsis
-    Counts pipeline objects.
-        
-    .Description
-    The Measure-PipedObjects command counts pipeline objects. The count is returned via the Count property of the hashtable referenced by the Counter parameter. 
-    Another object is returned with the Counter hashtable's CountByType property, showing how many of each object type were sent down the pipeline.
+        .Synopsis
+        Counts pipeline objects.
+            
+        .Description
+        The Measure-PipedObjects command counts pipeline objects. The count is returned via the Count property of the hashtable referenced by the Counter parameter. 
+        Another object is returned with the Counter hashtable's CountByType property, showing how many of each object type were sent down the pipeline.
 
-    .Parameter Counter
-    A hashtable reference. Required. The Count property returns the object count. The CountByType returns a [PSCustomObject] showing how many of each object type were counted.
-    
-    .Inputs
-    [System.Object]
-    
-    .Outputs
-    [System.Object] Each input object is returned to the pipeline unchanged.
-    Two values are returned via the hashtable that was passed in by reference. See the command description.
-    
-    .Example
-    $ht = @{} # an empty hashtable assigned to a variable
-    Get-Services | Measure-PipedObjects -Counter $ht
-    "Services count: $( $ht.Count )"
+        .Parameter Counter
+        A hashtable reference. Required. The Count property returns the object count. The CountByType returns a [PSCustomObject] showing how many of each object type were counted.
+        
+        .Inputs
+        [System.Object]
+        
+        .Outputs
+        [System.Object] Each input object is returned to the pipeline unchanged.
+        Two values are returned via the hashtable that was passed in by reference. See the command description.
+        
+        .Example
+        $ht = @{} # an empty hashtable assigned to a variable
+        Get-Services | Measure-PipedObjects -Counter $ht
+        "Services count: $( $ht.Count )"
     #>
     param(
         [parameter( Mandatory = $true,
             ValueFromPipeline = $false )]
-        [Hashtable] $Counter,
-        
+        [Hashtable] $Counter
+        ,
         [parameter( Mandatory = $true,
             ValueFromPipeline = $true )]
         [System.Object] $Object )
@@ -262,20 +262,20 @@ function Measure-PipedObjects
 function Convert-AsciiToChar
 {
     <#
-    .Synopsis
-    Converts Ascii values to characters
+        .Synopsis
+        Converts Ascii values to characters
 
-    .Inputs
-    [int] Ascii value(s), base 10
+        .Inputs
+        [int] Ascii value(s), base 10
 
-    .Outputs
-    [char] character(s)
+        .Outputs
+        [char] character(s)
 
-    .Example
-    @( 42, 43 ) | Convert-AsciiToChar
-    Output:
-    *
-    +
+        .Example
+        @( 42, 43 ) | Convert-AsciiToChar
+        Output:
+        *
+        +
     #>
 
     param(
@@ -374,20 +374,20 @@ function Out-Html
     param(
         [parameter( Mandatory = $true,
             ValueFromPipeline = $true )]
-        [System.Object] $InputObject,
-
-        [string] $Title ='Pipeline objects report',
-
-        [string] $Body = "<h1> $Title </h1>",
-
-        [string] $OutFile = 'out.htm',
-
-        [string] $CssUri = 'table.css',
-
-        [string] $Encoding = 'ASCII',
-
-        [Hashtable] $Properties,
-
+        [System.Object] $InputObject
+        ,
+        [string] $Title ='Pipeline objects report'
+        ,
+        [string] $Body = "<h1> $Title </h1>"
+        ,
+        [string] $OutFile = 'out.htm'
+        ,
+        [string] $CssUri = 'table.css'
+        ,
+        [string] $Encoding = 'ASCII'
+        ,
+        [Hashtable] $Properties
+        ,
         [alias( 'pt' )]
         [switch] $PassThru = $false
     )
@@ -564,4 +564,72 @@ function Out-Html
 
         $html.ToString() | Out-File @outArgs
     }
+}
+
+function Remove-TestArtifact
+{
+<#
+    .Synopsis
+    Removes test items.
+
+    .Description
+    Intended for removing test artifacts, such as files and folders created during a previous integration test, whose presence may invalidate a test.
+
+    The return value is an integer that specifies the number of tries/passes/attempts/loops performed for each artifact. The value is positive if removal of all artifacts was successful, otherwise it is negative.
+
+    .Parameter Artifacts
+    [System.String[]]. Mandatory. One or more relative or absolute paths that specify the item(s) to be removed.
+
+    .Parameter MaxTries
+    [System.Int32]. Optional. Specifies the number of loops. For large and/or complex test fixtures, this number might need to be raised from the default, which is 10.
+
+    .Parameter msPause
+    [System.Int32]. Optional. Milliseconds pause after each loop. Default is 250.
+
+    .Notes
+    The developer's research indicates that the System.IO.FileInfo Delete() method is asynchronous, which is the reason for the loop pause.
+
+    The Remove-Item cmdlet is not used. See issues/9246 link below.
+
+    .Link
+    https://github.com/PowerShell/PowerShell/issues/9246
+#>
+    param(
+        [parameter( Mandatory = $true )]
+        [string[]] $Artifacts
+        ,
+        [int] $MaxTries = 10
+        ,
+        [int] $msPause = 250
+    )
+
+    $testArgs = @{ ErrorAction = 'SilentlyContinue' }
+    $k = 0
+    foreach( $k in 1..$MaxTries )
+    {
+        $fail = $false
+        foreach( $artifact in $Artifacts ) {
+            if( Test-Path $artifact @testArgs ) 
+            {
+                Get-ChildItem $artifact -Recurse | ForEach-Object {
+                    try { $_.Delete() }
+                    catch { # Write-Host $_.Exception.Message -ForegroundColor Green
+                    }
+                }
+                try { (Get-Item $artifact).Delete() }
+                catch { # Write-Host $_.Exception.Message -ForegroundColor Magenta 
+                }
+            }
+            if( Test-Path $artifact @testArgs ) 
+            {
+                $fail = $true
+            }
+        }
+        if( -Not $fail )
+        {
+            return $k
+        }
+        Start-Sleep -Milliseconds $msPause
+    }
+    return - $k
 }
