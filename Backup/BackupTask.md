@@ -29,9 +29,9 @@ The following are steps and *suggested* settings for creating a new backup task 
   - Type `wscript` in the *Program/script:* field.
   - In the *Add arguments* field, type the path to your customized `BackupTask.vbs`, including the filename. Surround it in quotes if there are spaces in the path, or if you are unsure. Example:
 
-  ``` PowerShell
+  ``` cmd
 
-  "$env:PSBackup\Backup\BackupTask.vbs"
+  "<path>\<to>\BackupTask.vbs"
   ```
 
   - Click *OK* to save changes.
