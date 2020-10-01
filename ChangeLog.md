@@ -16,7 +16,7 @@ Change log for the PSBackup project.
 
 `` ``
 
-[Version 0.0]: #version-0.0
+[Version 0.0]: #version-00
 
 [ProjectInfo.ps1]: ./ProjectInfo.ps1
 [Issues]: ./ReadMe.md#issues
