@@ -31,7 +31,7 @@ The PSBackup project was tested with Windows PowerShell 5.1 and PowerShell Core 
 
 ## Getting started
 
-`Setup.ps1` adds the project path to a profile file.
+`Setup.ps1` modifies a profile file to make the project's modules discoverable.
 
 ```PowerShell
 .\Setup.ps1
@@ -39,7 +39,9 @@ The PSBackup project was tested with Windows PowerShell 5.1 and PowerShell Core 
 
 > Restart the console window for changes to take effect.
 
-By default, the CurrentUserAllHosts profile file is used, typically `$home\Documents\WindowsPowerShell\profile.ps1` for PowerShell version 5, and `$home\Documents\PowerShell\profile.ps1` for PowerShell versions 6 and higher (formerly known as PowerShell Core). The file and path will be created if they do not exist. In order to use a profile other than CurrentUserAllHosts, type
+By default, the CurrentUserAllHosts profile file is used, typically `$home\Documents\WindowsPowerShell\profile.ps1` for PowerShell version 5, and `$home\Documents\PowerShell\profile.ps1` for PowerShell versions 6 and higher (formerly known as PowerShell Core). The file and path will be created if they do not exist.
+
+In order to use a profile other than CurrentUserAllHosts, type
 
 ``` PowerShell
 .\Setup.ps1 -ProfileName  # with a space after -ProfileName

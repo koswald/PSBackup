@@ -7,7 +7,7 @@ Change log for the PSBackup project.
 ## Version 0.0
 
 - Added version information. See [ProjectInfo.ps1].
-- Added the Issues section to the [ReadMe.md].
+- Added the [Issues] section to the [ReadMe.md].
 - Improved integration tests.
 - Added the `Remove-TestArtifact` function to the Utility module.
 - Efforts to move toward a Linux port have been delayed, perhaps indefinitely, so `/` has been replaced with `\` in paths, even though PowerShell on Windows dealt with them just fine.
@@ -19,4 +19,5 @@ Change log for the PSBackup project.
 [Version 0.0]: #version-0.0
 
 [ProjectInfo.ps1]: ./ProjectInfo.ps1
+[Issues]: ./ReadMe.md#issues
 [ReadMe.md]: ./ReadMe.md
