@@ -26,7 +26,7 @@ $t.describe( 'DP1: Auto. variable $?')
     $t.it( 'should catch the error' )
     $er = $null
     $e = $null
-    $giArgs = @{ Path = './NoSuch.txtxt'
+    $giArgs = @{ Path = '.\NoSuch.txtxt'
                  ErrorAction = 'SilentlyContinue'
                  ErrorVariable = 'er'}
     Get-Item @giArgs
@@ -45,7 +45,7 @@ $t.describe( 'DP2: ErrorVariable (EV)')
     $t.it( 'should catch the error' )
     $er = $null
     $e = $null
-    $giArgs = @{ Path = './NoSuch.txtxt'
+    $giArgs = @{ Path = '.\NoSuch.txtxt'
                  ErrorAction = 'SilentlyContinue'
                  ErrorVariable = 'er'}
     Get-Item @giArgs
@@ -65,10 +65,10 @@ $t.describe( 'Design pattern 3: Try/Catch' )
 
     $t.it( 'should catch the error' )
     $e = $null
-    $giArgs = @{ Path = './NoSuch.txtxt'
+    $giArgs = @{ Path = '.\NoSuch.txtxt'
                  ErrorAction = 'Stop' }
 
-    try { Get-Item @giArgs } 
+    try { Get-Item @giArgs }
 
     catch  [ItemNotFoundException] { # or catch {
         $e = $_
@@ -92,11 +92,11 @@ $t.describe( 'DP4: EV, advanced function' )
 
     $er = $null
     $err = $null
-    $GnsiArgs = @{ Path = './NoSuch2.txt'
+    $GnsiArgs = @{ Path = '.\NoSuch2.txt'
                 ErrorAction = 'SilentlyContinue'
                 ErrorVariable = 'er' }
     Get-NoSuchItem @GnsiArgs | Out-Null
-    
+
     if( $null -ne $er )
     {
         $err = $er[0]
@@ -112,11 +112,11 @@ $t.describe( 'DP5: $global:Error')
     $t.it( 'should catch the error' )
     $initialCount = [ErrorRemover]::new().RemoveError()
     $e = $null
-    $giArgs = @{ Path = '/NoSuch.txtxt'
+    $giArgs = @{ Path = '\NoSuch.txtxt'
                  ErrorAction = 'SilentlyContinue' }
 
     Get-Item @giArgs
-    
+
     if( $global:Error.Count -gt $initialCount )
     {
         $e = $global:Error[0]

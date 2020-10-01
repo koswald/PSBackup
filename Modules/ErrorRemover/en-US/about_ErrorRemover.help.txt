@@ -9,7 +9,7 @@ Provides an aid to error handling.
 
 LONG DESCRIPTION
 
-The ErrorRemover class provides a method that enables reliably catching an error by watching the Count property of the $global:Error automatic variable. 
+The ErrorRemover class provides a method that enables reliably catching an error by watching the Count property of the $global:Error automatic variable.
 
 The $global:Error variable is a System.Collections.ArrayList containing the most recent ErrorRecord objects, and it typically has a capacity of 256 objects. If the variable is at capacity, watching the Count property will not indicate whether an error has occurred, unless...
 
@@ -22,7 +22,7 @@ using Module ErrorRemover # at the top of the .ps1/.psm1 file
 $remover = [ErrorRemover]::new()
 $beginningCount = $remover.RemoveError()
 
-$item = Get-Item './none.such.item' -EA 'SilentlyContinue'
+$item = Get-Item '.\none.such.item' -EA 'SilentlyContinue'
 
 if( $global:Error.Count -gt $beginningCount )
 {
@@ -34,8 +34,8 @@ if( $global:Error.Count -gt $beginningCount )
 
 KEYWORDS
 
-Error, Error handling, 
+Error, Error handling,
 
 SEE ALSO
 
-Get-Help ./IntegrationTests/Test_Pattern_ErrorHandling.ps1
+Get-Help .\IntegrationTests\Test_Pattern_ErrorHandling.ps1

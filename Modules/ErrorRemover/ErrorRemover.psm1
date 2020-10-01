@@ -9,8 +9,8 @@ class ErrorRemover
         else { $max = 256 } #the default
 
         while ( $global:Error.Count -ge $max ){
-            $global:Error.RemoveAt( 
-                $global:Error.Count - 1 
+            $global:Error.RemoveAt(
+                $global:Error.Count - 1
             )
         }
         return $global:Error.Count

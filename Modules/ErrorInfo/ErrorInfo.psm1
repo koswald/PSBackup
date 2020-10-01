@@ -12,34 +12,34 @@ class ErrorInfo
     [string] $LineNumber
     [string] $ExceptionName
     [string] $ExceptionFullName
-    
+
     # constructor #1
     ErrorInfo( [ErrorRecord] $er )
     {
         $this.Init( $er )
     }
-    
+
     # constructor #2
     ErrorInfo( [ErrorRecord] $er, [String] $message )
     {
         $this.Init( $er, $message )
     }
-    
+
     hidden Init( [ErrorRecord] $er )
     {
         [Exception] $exc = $er.Exception
-        
+
         $this.Message = $exc.Message
         $this.ExceptionName = $exc.GetType().Name
         $this.ExceptionFullName = $exc.GetType().FullName
 
         [InvocationInfo] $info = $er.InvocationInfo
-            
+
         $this.ScriptName = [Path]::
             GetFileName( $info.ScriptName )
         $this.LineNumber =$info.ScriptLineNumber
     }
-    
+
     hidden Init( [ErrorRecord] $er, [String] $message )
     {
         $this.Init( $er )

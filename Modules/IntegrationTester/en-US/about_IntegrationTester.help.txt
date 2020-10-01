@@ -17,7 +17,7 @@ Describe
 Accepts the name of the unit under test.
 
 It
-Accepts a specification description, 'should copy a file', for example. An error received between the 'it' method call and the assertion statement is shown in the Err field of the output object. 
+Accepts a specification description, 'should copy a file', for example. An error received between the 'it' method call and the assertion statement is shown in the Err field of the output object.
 
 AssertEqual
 Accepts and compares a pair of [int], [bool], or [string] values. Returns a results object.

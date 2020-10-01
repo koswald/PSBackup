@@ -11,46 +11,10 @@ $PSCommandPath |
     Set-Location
 
 # remove previous test folders, which if present may give incorrect test results
-function Remove-Artifacts
-{
-    param(
-        [parameter( Mandatory = $true )]
-        [string[]] $Artifacts,
-        [int] $MaxTries = 100,
-        [int] $msPause = 250
-    )
-
-    $RemoveArgs = @{ Recurse = $true
-                     Force = $true
-                     ErrorAction = 'SilentlyContinue' }
-    $testArgs = @{ ErrorAction = 'SilentlyContinue' }
-        
-    $i = 0
-    foreach( $i in 1..$MaxTries )
-    {
-        $fail = $false
-        $Artifacts | ForEach-Object {
-            if( Test-Path $_ @testArgs ) 
-            {
-                Remove-Item $_ @RemoveArgs
-            }
-            if( Test-Path $_ @testArgs ) 
-            {
-                $fail = $true
-            }
-        }
-        if( -Not $fail )
-        {
-            return $i
-        }
-        Start-Sleep -m $msPause
-    }
-    return - $i
-}
 $artifacts = @(
-    './Src'
+    '.\Src'
 )
-if(( Remove-Artifacts $artifacts ) -lt 0 ) {
+if(( Remove-TestArtifact $artifacts ) -lt 0 ) {
     Throw "One or more test artifacts could not be removed. Test script {0} could not be run." -f ( $PSCommandPath | Split-Path -Leaf )
 }
 
@@ -59,44 +23,44 @@ if(( Remove-Artifacts $artifacts ) -lt 0 ) {
 # New-Item args
 $stop = @{ ErrorAction = 'Stop' }
 @(
-    @{ Path = './Src'; ItemType = 'Directory' }
-    @{ Path = './Src/a'; ItemType = 'Directory' }
-    @{ Path = './Src/b'; ItemType = 'Directory' }
-    @{ Path = './Src/c'; ItemType = 'Directory' }
-    @{ Path = './Src/d'; ItemType = 'Directory' }
-    @{ Path = './Src/ReadMe.md'; ItemType = 'File' }
-    @{ Path = './Src/.gitignore'; ItemType = 'File' }
-    @{ Path = './Src/license.txt'; ItemType = 'File' }
-    @{ Path = './Src/Setup.ps1'; ItemType = 'File' }
-    @{ Path = './Src/a/alpha.ps1'; ItemType = 'File' }
-    @{ Path = './Src/b/bravo.psm1'; ItemType = 'File' }
-    @{ Path = './Src/c/charlie.psd1'; ItemType = 'File' }
-    @{ Path = './Src/d/delta.cs'; ItemType = 'File' }
-) | ForEach-Object { 
+    @{ Path = '.\Src'; ItemType = 'Directory' }
+    @{ Path = '.\Src\a'; ItemType = 'Directory' }
+    @{ Path = '.\Src\b'; ItemType = 'Directory' }
+    @{ Path = '.\Src\c'; ItemType = 'Directory' }
+    @{ Path = '.\Src\d'; ItemType = 'Directory' }
+    @{ Path = '.\Src\ReadMe.md'; ItemType = 'File' }
+    @{ Path = '.\Src\.gitignore'; ItemType = 'File' }
+    @{ Path = '.\Src\license.txt'; ItemType = 'File' }
+    @{ Path = '.\Src\Setup.ps1'; ItemType = 'File' }
+    @{ Path = '.\Src\a\alpha.ps1'; ItemType = 'File' }
+    @{ Path = '.\Src\b\bravo.psm1'; ItemType = 'File' }
+    @{ Path = '.\Src\c\charlie.psd1'; ItemType = 'File' }
+    @{ Path = '.\Src\d\delta.cs'; ItemType = 'File' }
+) | ForEach-Object {
     if( -Not ( Test-Path $_.Path @stop )) {
         New-Item @_ | Out-Null
     }
 }
  #clear archive bit(s)
 @(
-#    './Src/p/one.ps1'
+#    '.\Src\p\one.ps1'
 ) | ForEach-Object {
     Clear-ArchiveBit ( Get-Item $_ ) @Stop
 }
 function Get-NameString
 {
     param( [FileInfo[]] $Files )
-    
+
     # make a list of file names
     $list = [Generic.List[string]]::new()
     foreach( $file in $Files )
     {
         $list.Add( $file.Name )
     }
-    
+
     # sort the list alphabetically
     $list.Sort()
-    
+
     # ToString()
     $str = ''
     foreach( $file in $list )
@@ -113,7 +77,6 @@ function Get-NameString
 
 
 [Directory]::SetCurrentDirectory( $PWD )
-"Current directory: $([Environment]::CurrentDirectory)"
 
 $t = [IntegrationTester]::new()
 
@@ -123,7 +86,7 @@ $t.describe( 'Get-BackupFiles')
 
 $t.it( 'should include and exclude with Subfolders $true' )
 $Spec = @{
-    Src = "./Src"
+    Src = ".\Src"
     Include = "*.p*", "*.md", "*.txt"
     Exclude = "a*", "c*"
     Subfolders = $true }
@@ -134,7 +97,7 @@ $t.AssertEqual(
 )
 $t.it( 'should include and exclude with Subfolders $false' )
 $Spec = @{
-    Src = "./Src"
+    Src = ".\Src"
     Include = "*t*", "*.md"
     Exclude = "*p*", "*s*"
     Subfolders = $false }
@@ -145,7 +108,7 @@ $t.AssertEqual(
 )
 $t.it( 'should include and exclude with one item only (Recurse)' )
 $Spec = @{
-    Src = "./Src"
+    Src = ".\Src"
     Include = "*.p*"
     Exclude = "a*"
     Subfolders = $true }
@@ -156,7 +119,7 @@ $t.AssertEqual(
 )
 $t.it( 'should include and exclude with one item only (no Recurse)' )
 $Spec = @{
-    Src = "./Src"
+    Src = ".\Src"
     Include = "*.p*"
     Exclude = "a*"
     Subfolders = $false }
@@ -167,7 +130,7 @@ $t.AssertEqual(
 )
 $t.it( 'should ignore empty include and exclude item (Recurse)' )
 $Spec = @{
-    Src = "./Src"
+    Src = ".\Src"
     Include = "", "*.p*"
     Exclude = "", "a*"
     Subfolders = $true }
@@ -178,7 +141,7 @@ $t.AssertEqual(
 )
 $t.it( 'should ignore empty include and exclude item (No Recurse)' )
 $Spec = @{
-    Src = "./Src"
+    Src = ".\Src"
     Include = "", "*.p*"
     Exclude = "", "a*"
     Subfolders = $false }
@@ -189,7 +152,7 @@ $t.AssertEqual(
 )
 $t.it( 'should not exclude with one empty item (Recurse)')
 $Spec = @{
-    Src = "./Src"
+    Src = ".\Src"
     Include = "*t*"
     Exclude = ""
     Subfolders = $true }
@@ -200,7 +163,7 @@ $t.AssertEqual(
 )
 $t.it( 'should not exclude with one empty item (no Recurse)')
 $Spec = @{
-    Src = "./Src"
+    Src = ".\Src"
     Include = "*t*"
     Exclude = ""
     Subfolders = $false }
@@ -211,9 +174,9 @@ $t.AssertEqual(
 )
 $t.it( 'should not exc. with missing exc. key in spec (Recurse)')
 $Spec = @{
-    Src = "./Src"
+    Src = ".\Src"
     Include = "*"
-    Dest = "./Dest"
+    Dest = ".\Dest"
     Subfolders = $true }
 Optimize-SpecData $Spec
 $files = Get-BackupFiles $Spec
@@ -223,8 +186,8 @@ $t.AssertEqual(
 )
 $t.it( 'should not exc. with missing exc. key in spec (no Recurse)')
 $Spec = @{
-    Src = "./Src"
-    Dest = "./Dest"
+    Src = ".\Src"
+    Dest = ".\Dest"
     Include = "*"
     Subfolders = $false }
 Optimize-SpecData $Spec
@@ -234,4 +197,4 @@ $t.AssertEqual(
     '.gitignore|license.txt|ReadMe.md|Setup.ps1'
 )
 
-Remove-Artifacts $artifacts > $null
+Remove-TestArtifact $artifacts > $null

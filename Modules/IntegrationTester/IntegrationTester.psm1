@@ -14,33 +14,31 @@ class IntegrationTester
     [ErrorRemover] $remover
     [int] $erCount
     [bool] $ignoreError
-    
+
     # constructor
     IntegrationTester()
     {
-         $this.remover =
-             [ErrorRemover]::new()
- 
-         $this.result = 
-             [OrderedDictionary]::new()
-         $this.result.Add( 'Result', '' )
-         $this.result.Add( 'Unit', '' )
-         $this.result.Add( 'Spec', '' )
-         $this.result.Add( 'Actual', '' )
-         $this.result.Add( 'Expected', '' )
-         $this.result.Add( 'Err', '' )
-         
-         [process] $proc = 
-             Get-Process -pid $global:pid
-         [string] $hostname = $proc.Name
-         $this.result.Add( 'Host', $hostname )
-         
-         $psvt = $global:PSVersionTable
-         $psv = $psvt.PSVersion
-         [string] $PSVer = $psv.ToString()
-         $this.result.Add( 'Version', $PSVer )
+        $this.remover = [ErrorRemover]::new()
+
+        # initialize the test-result object
+
+        $this.result = [OrderedDictionary]::new()
+        $this.result.Add( 'Result', '' )
+        $this.result.Add( 'Unit', '' )
+        $this.result.Add( 'Spec', '' )
+        $this.result.Add( 'Actual', '' )
+        $this.result.Add( 'Expected', '' )
+        $this.result.Add( 'Err', '' )
+
+        # get the name and version of the PowerShell host
+
+        [process] $proc = Get-Process -pid $global:pid
+        $this.result.Add( 'Host', $proc.Name )
+
+        $psvt = $global:PSVersionTable
+        $this.result.Add( 'Version', $psvt.PSVersion.ToString() )
     }
-    
+
     [void] ResetResult( [boolean] $full )
     {
          $this.result[ 'Result' ] = ''
@@ -58,27 +56,23 @@ class IntegrationTester
     [void] it( [string] $spec )
     {
         $this.result.Spec = $spec
-        $this.erCount =
-            $this.remover.RemoveError()
+        $this.erCount = $this.remover.RemoveError()
         $this.ignoreError = $false
         $global:ErrorActionPreference = 'SilentlyContinue'
     }
-    [PSCustomObject] AssertEqual( 
-        [object] $actual, 
-        [object] $expected )
+    [PSCustomObject] AssertEqual( [object] $actual, [object] $expected )
     {
         $global:ErrorActionPreference = 'Continue'
         $this.result.Actual = $actual
         $this.result.Expected = $expected
-        
+
         $newErCount = $global:Error.Count
-        
+
         if($newErCount -gt $this.erCount -and
-            -not $this.ignoreError ) 
+            -not $this.ignoreError )
         {
             $this.result.Result = 'error'
-            [string] $msg = 
-                $this.GetErrMsg($global:Error[0])
+            [string] $msg = $this.GetErrMsg($global:Error[0])
             $this.result.Err = $msg
             $this.result.actual = $msg
         }
@@ -90,9 +84,7 @@ class IntegrationTester
         {
             $this.result.Result = 'fail'
         }
-        
-        $return =
-            [PSCustomObject] $this.result
+        $return = [PSCustomObject] $this.result
         $this.ResetResult( $false )
         return $return
     }
@@ -113,12 +105,12 @@ class IntegrationTester
             {
                 $this.result.Result = 'pass'
             }
-            else 
+            else
             {
                 $this.result.Result = 'fail'
             }
         }
-        else 
+        else
         {
             $this.result.Result = 'fail'
             $this.result.Actual = 'No error'
@@ -133,8 +125,7 @@ class IntegrationTester
         return '{0} {1} at {2}:{3}.' -f @(
             $er.ToString()
             $er.Exception.GetType().FullName
-            ( $er.InvocationInfo.ScriptName |
-                Split-Path -Leaf )
+            ( $er.InvocationInfo.ScriptName | Split-Path -Leaf )
             $er.InvocationInfo.ScriptLineNumber
          )
     }

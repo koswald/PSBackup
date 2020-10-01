@@ -2,7 +2,7 @@
 # Module manifest for module 'IntegrationTester'
 #
 @{
-    RootModule = './IntegrationTester.psm1'
+    RootModule = '.\IntegrationTester.psm1'
     ModuleVersion = '0.0.1'
     CompatiblePSEditions = @('Core', 'Desktop')
     GUID = 'ab0997c7-4da8-46e7-89c9-5953a358c07d'
@@ -11,7 +11,7 @@
     Copyright = '(c) 2020 Karl Oswald. All rights reserved.'
     Description = 'Provides testing features.'
     PowerShellVersion = '5.1.0' # Minimum
-    RequiredModules = @( 
+    RequiredModules = @(
         'ErrorRemover'
     )
     FunctionsToExport = @()
@@ -19,7 +19,7 @@
     VariablesToExport = '*'
     AliasesToExport = @()
     FileList = @(
-        './IntegrationTester.psm1' 
+        '.\IntegrationTester.psm1'
     )
 }
 

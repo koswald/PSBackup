@@ -1,4 +1,7 @@
-# This file a placeholder
-# To open the command-line help file for this project, .\en-US\about_PSBackup.help.txt, type
+<#
+    This file is a placeholder
 
-# PS C:\> help about_PSBackup
+    To view the help file for this project, .\en-US\about_PSBackup.help.txt, type
+
+    Get-Help about_PSBackup
+#>

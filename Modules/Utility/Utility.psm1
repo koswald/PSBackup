@@ -26,13 +26,13 @@ function Clear-ArchiveBit
     <#
         .Synopsis
         Clears the archive bit on a file.
-        
+
         .Description
         Clears the archive bit on a file. The file may be either a relative path [string], a full path [string], or a [System.IO.FileInfo] object returned by the Get-Item cmdlet, as in Get-Item ".\MyFile.txt".
     #>
     param(
         [parameter()] [object] $file )
-        
+
     if ( $null -eq $file.fullName )
     {
         # convert [string] to [FileInfo]
@@ -46,14 +46,14 @@ function New-Folder
     <#
         .Synopsis
         Creates a directory.
-        
+
         .Description
         The New-Folder command creates a new folder and, if necessary, the parent folders too.
     #>
     param(
          [parameter( Mandatory = $true )]
          [string] $Path )
-         
+
     if ( -Not ( Test-Path $Path ))
     {
         $NiArgs = @{
@@ -84,7 +84,7 @@ function Test-Match
     param(
         [parameter( Mandatory = $true )]
         [string] $TestString,
-        
+
         [parameter( Mandatory = $false )]
         [string[]] $Wildcards )
 
@@ -108,19 +108,19 @@ function Get-Datestamp
     <#
         .Synopsis
         Get a datestamp for "now".
-        
+
         .Parameter ForFileName
         Set to $true to get a datestamp suitable for a filename. Default is $false.
     #>
     param(
         [Parameter()]
         [switch] $ForFileName = $false )
-        
+
     if( $ForFileName ) {
         # file-name compatible
         $format = @{ UFormat = "%Y-%m-%d--%H%M%S" }
-        
-    } else { 
+
+    } else {
         # human read
         $format = @{ UFormat = "%m-%d-%Y %H:%M:%S" }
     }
@@ -132,10 +132,10 @@ function Get-FileName
     <#
         .Synopsis
         Gets a filename.
-        
+
         .Description
         The Get-FileName command gets the filename from a path, including the extension.
-        
+
         .Example
         Get-FileName 'C:\file.ext' # file.ext
     #>
@@ -151,10 +151,10 @@ function Get-FileBaseName
     <#
         .Synopsis
         Gets a  file's base name.
-        
+
         .Description
         The Get-FileBaseName command gets the filename from a path, excluding the extension.
-        
+
         .Example
         Get-FileBaseName 'C:\file.ext' # file
     #>
@@ -168,7 +168,7 @@ function Get-FileBaseName
         return $Path | Split-Path -LeafBase
     } else {
         return [System.IO.path]::
-          GetFileNameWithoutExtension( 
+          GetFileNameWithoutExtension(
               $Path )
     }
 }
@@ -179,7 +179,7 @@ function Get-ScriptName
         .Description
         Gets the name of the calling script, including the extension.
     #>
-    $path = @{ 
+    $path = @{
         Path = $MyInvocation.ScriptName }
     return Get-FileName @path
 }
@@ -208,21 +208,21 @@ function Measure-PipedObjects
     <#
         .Synopsis
         Counts pipeline objects.
-            
+
         .Description
-        The Measure-PipedObjects command counts pipeline objects. The count is returned via the Count property of the hashtable referenced by the Counter parameter. 
+        The Measure-PipedObjects command counts pipeline objects. The count is returned via the Count property of the hashtable referenced by the Counter parameter.
         Another object is returned with the Counter hashtable's CountByType property, showing how many of each object type were sent down the pipeline.
 
         .Parameter Counter
         A hashtable reference. Required. The Count property returns the object count. The CountByType returns a [PSCustomObject] showing how many of each object type were counted.
-        
+
         .Inputs
         [System.Object]
-        
+
         .Outputs
         [System.Object] Each input object is returned to the pipeline unchanged.
         Two values are returned via the hashtable that was passed in by reference. See the command description.
-        
+
         .Example
         $ht = @{} # an empty hashtable assigned to a variable
         Get-Services | Measure-PipedObjects -Counter $ht
@@ -236,10 +236,10 @@ function Measure-PipedObjects
         [parameter( Mandatory = $true,
             ValueFromPipeline = $true )]
         [System.Object] $Object )
-        
+
     Begin
     {
-        $Counter.Count = 0 
+        $Counter.Count = 0
         $cbt = @{}
     }
     Process
@@ -282,7 +282,7 @@ function Convert-AsciiToChar
         [parameter( Mandatory = $true,
             ValueFromPipeline = $true )]
         [int16] $Ascii )
-        
+
     Process { [char] [byte] $Ascii }
 }
 
@@ -309,9 +309,9 @@ function Convert-HexToChar
     #>
     param(
         [parameter( Mandatory = $true,
-            ValueFromPipeline = $true )] 
+            ValueFromPipeline = $true )]
         [string] $Hex )
-        
+
     Process { [char] [byte] "0x$Hex" }
 }
 
@@ -322,7 +322,7 @@ function Out-Html
     Writes objects to an .html file.
 
     .Description
-    Converts pipeline objects to an html file. Objects continue down the pipeline if and only if the PassThru switch parameter is used. Object properties to include may be selected using the Properties parameter. 
+    Converts pipeline objects to an html file. Objects continue down the pipeline if and only if the PassThru switch parameter is used. Object properties to include may be selected using the Properties parameter.
 
     For information about the parameters, type Get-Help Out-Html -Detailed.
 
@@ -391,14 +391,14 @@ function Out-Html
         [alias( 'pt' )]
         [switch] $PassThru = $false
     )
-    
-    Begin 
+
+    Begin
     {
-        $outArgs = @{ 
+        $outArgs = @{
             FilePath = $OutFile
             Append = $true
             Encoding = $Encoding }
-        
+
         If ( Test-Path $outFile )
         {
             Clear-Content $outFile
@@ -438,7 +438,7 @@ function Out-Html
             # use only the specified properties
             $props = $Properties[$type]
         }
-        else 
+        else
         {
             # use all available properties
             $props = $InputObject |
@@ -472,16 +472,16 @@ function Out-Html
             # close the table header row
             [void] $html.Append( '</tr>' )
         }
-       
+
         # write a table row for the current object
-        
+
         # start the new row
         [void] $html.Append( "`n<tr>" )
 
         foreach( $prop in $props )
         {
            # write a single cell in the row
-           
+
             if( 'String' -eq $type )
             {
                  [void] $html.Append( '<td> {0} </td>' -f $InputObject )
@@ -489,15 +489,15 @@ function Out-Html
             elseif( $prop.IndexOf( "." ) -gt 0 )
             {
                 # multiple / nested properties
-                
+
                 $index = $prop.IndexOf( '.' )
                 $prop1 = $prop.Substring( 0, $index )
                 $prop2 = $prop.Substring( $index + 1, $prop.Length - $index - 1 )
-                
+
                 if( $prop2.IndexOf( '.' ) -gt 0 )
                 {
                     # three levels of properties
-                    
+
                     $index = $prop2.IndexOf( '.' )
                     $prop2a = $prop2.Substring( 0, $index )
                     $prop2b = $prop2.Substring(
@@ -505,7 +505,7 @@ function Out-Html
                     )
                     if( 'GetType()' -like $prop2a )
                     {
-                        [void] $html.Append( 
+                        [void] $html.Append(
                             '<td> {0} </td>' -f $InputObject.$prop1.GetType().$prop2b
                          )
                     }
@@ -517,7 +517,7 @@ function Out-Html
                     }
                 }
                 # two levels of properties
-                
+
                 elseif( 'ToString()' -like $prop2 )
                 {
                     [void] $html.Append(
@@ -546,7 +546,7 @@ function Out-Html
         } # end foreach property
         # finish the row
         [void] $html.Append( '</tr>' )
-        
+
         $tableHasUnclosedTag = $true
         $previousType = $type
         $loop++
@@ -609,7 +609,7 @@ function Remove-TestArtifact
     {
         $fail = $false
         foreach( $artifact in $Artifacts ) {
-            if( Test-Path $artifact @testArgs ) 
+            if( Test-Path $artifact @testArgs )
             {
                 Get-ChildItem $artifact -Recurse | ForEach-Object {
                     try { $_.Delete() }
@@ -617,10 +617,10 @@ function Remove-TestArtifact
                     }
                 }
                 try { (Get-Item $artifact).Delete() }
-                catch { # Write-Host $_.Exception.Message -ForegroundColor Magenta 
+                catch { # Write-Host $_.Exception.Message -ForegroundColor Magenta
                 }
             }
-            if( Test-Path $artifact @testArgs ) 
+            if( Test-Path $artifact @testArgs )
             {
                 $fail = $true
             }

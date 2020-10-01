@@ -16,8 +16,10 @@ Requires Windows.
 EXAMPLE
 
 using Module PrivilegeChecker
-$pc = [PrivilegeChecker]::new()
-$elevated = $pc::PrivilegesAreElevated()
+[PrivilegeChecker]::PrivilegesAreElevated()
+
+Output (if the host is not running elevated):
+False
 
 KEYWORDS
 

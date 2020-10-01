@@ -32,24 +32,22 @@ function Copy-FSItem
             $ss.Subfolders = $false
         }
         New-Folder $ss.Dest -ErrorAction 'Stop'
-        
-        $ciArgs = @{
-            Path = $ss.Src
-            Filter = $ss.Include
-            Destination = $ss.Dest
-            Recurse = $ss.Subfolders
-            Force = $ss.Force
-            ErrorAction = 'Continue' }
 
+        $ciArgs = @{ Path = $ss.Src
+                     Filter = $ss.Include
+                     Destination = $ss.Dest
+                     Recurse = $ss.Subfolders
+                     Force = $ss.Force
+                     ErrorAction = 'Continue' }
         Copy-Item @ciArgs
     }
-        
+
     <#
     .Synopsis
     Copies a folder
 
     .Description
-    Copies a folder. Suitable for bulk, unattended copy. 
+    Copies a folder. Suitable for bulk, unattended copy.
 
     .Parameter BackupSpec
     Hashtable(s) with the following key names
@@ -59,7 +57,7 @@ function Copy-FSItem
         Subfolders
         Force
     Src and Dest are required.
-    Subfolders and Force are $false by default. 
+    Subfolders and Force are $false by default.
     Include is * by default.
 
     .Example
@@ -101,7 +99,7 @@ function Copy-Here
         $app = New-Object -ComObject $prid
         New-Folder $ss.Dest > $null
         # relative path => absolute path
-        $ss.Dest = 
+        $ss.Dest =
             ( Get-Item $ss.Dest ).FullName
         $folder = $app.Namespace($ss.Dest)
         $src = "{0}\{1}" -f $ss.Src, $ss.Include
@@ -121,7 +119,7 @@ function Copy-Here
         Src
         Dest
         Include
-            
+
     .Example
     $folder1 = @{
         Src = "$env:AppData\MyData"
@@ -129,9 +127,9 @@ function Copy-Here
         Include = "*"
     }
     $folder1 | Copy-Here
-        
+
     .Notes
-    Uses the Windows-native Shell.Application CopyHere method, which includes a progress bar.
+    Uses the Windows-native Shell.Application CopyHere method, which includes a progress bar, requests for elevated privileges as necessary, and has other UI features such as requesting overwrite permission and applying user response to all items, if desired.
     #>
 }
 
@@ -153,7 +151,7 @@ function Optimize-Percent( [Single] $x )
     <#
     .Synopsis
     Validate Write-Progress -PercentComplete
-    #> 
+    #>
 
     if( $x -lt 0 )
     {
@@ -185,8 +183,10 @@ function Get-BackupFiles
     For internal use. Exported for testing.
     The validation function Optimize-SpecData is called before this one.
     #>
-    param( [parameter( Mandatory = $true )]
-           [Hashtable] $Spec )
+    param( [parameter( Mandatory )]
+           [Hashtable] $Spec
+           ,
+           [switch] $IncludeNonarchived = $false )
 
     $gciArgs = @{
         Path = $Spec.Src
@@ -199,11 +199,16 @@ function Get-BackupFiles
         ErrorAction = 'Continue'
         ErrorVariable = 'er' }
 
+    if( $IncludeNonarchived )
+    {
+        $gciArgs.Remove( 'Attributes' )
+    }
+
     # Case 1: PowerShell Core root folder only.
     # Include and Exclude work only with Recurse of $true and Filter of '*', as with Windows PowerShell. But unlike Windows PowerShell, Depth of 0 prevents actual recurse.
 
     if( -Not $Spec.Subfolders -And
-        $PSVersionTable.PSVersion.Major -ge 6 ) 
+        $PSVersionTable.PSVersion.Major -ge 6 )
     {
         $gciArgs.Depth = 0
         $gciArgs.Recurse = $true
@@ -218,14 +223,14 @@ function Get-BackupFiles
         $gciArgs.Remove('Include')
         $gciArgs.Remove('Exclude')
         $gciArgs.Recurse = $false
-        
+
         # get a list of all archivable files in the root folder
         $list = [Generic.List[FileInfo]]::new()
         foreach( $file in Get-ChildItem @gciArgs )
         {
             $list.Add( $file )
         }
-        
+
         # exclude
         foreach( $filterOut in $Spec.Exclude )
         {
@@ -235,7 +240,7 @@ function Get-BackupFiles
             }
             $list.RemoveAll( $predicate ) | Out-Null
         }
-        
+
         # include
         $files = [Generic.HashSet[FileInfo]]::new()
         foreach( $filterIn in $Spec.Include )
@@ -281,7 +286,7 @@ function Get-CommonBackupPath
     .Notes
     Exported for testing only.
     #>
-    
+
     param( [parameter( Mandatory = $true )]
            [Hashtable] $Spec )
 
@@ -297,7 +302,7 @@ function Optimize-SpecData
     .Notes
     Exported for testing only.
     #>
-    
+
     param(
         [parameter( Mandatory = $true )]
         [Hashtable] $SpecSheet )
@@ -316,7 +321,7 @@ function Optimize-SpecData
     }
 
     # set default values
-    
+
     if( $null -eq $ss.Name )
     {
         $ss.Name = 'Name not specified'
@@ -381,14 +386,14 @@ function Optimize-SpecData
             }
         }
     }
-    if( $null -eq $ss.VersionsOnDest ) 
+    if( $null -eq $ss.VersionsOnDest )
     {
        $ss.VersionsOnDest = @()
     }
     else
     {
         foreach( $version in $ss.VersionsOnDest )
-        { 
+        {
             if( $null -eq $version.MaxQty )
             {
                 $version.MaxQty = $DefaultMaxVersionQty
@@ -422,7 +427,7 @@ function Optimize-SpecData
         # signal the calling function
         # to skip this backup spec
         $ss.OptimizeError = $true
-        
+
         # throw
         $contextMessage = "{0} '{1}'. {2}{3}" -f @(
             'Skipping backup spec'
@@ -452,6 +457,10 @@ function Backup-Updates
         [parameter( Mandatory = $true,
             ValueFromPipeline = $true )]
         [Hashtable] $SpecSheet
+        ,
+        [switch] $NoPassThru = $false
+        ,
+        [switch] $IncludeNonarchived = $false
     )
     Begin
     {
@@ -475,19 +484,20 @@ function Backup-Updates
             id = 1
             PercentComplete = 0 }
         Write-Progress @progressArgs
-    
+
         # get child items
         $er = $null
         $gbfArgs = @{ Spec = $Spec
-                ErrorAction = 'SilentlyContinue'
-                ErrorVariable = $er }
+                      IncludeNonarchived = $IncludeNonarchived
+                      ErrorAction = 'SilentlyContinue'
+                      ErrorVariable = $er }
         $files = Get-BackupFiles @gbfArgs
 
         if ( -Not ( $null -eq $er ))
         {
             # ErrorRecord obj => error stream
             $PSCmdlet.WriteError( $er[0] )
-            
+
             # ErrorInfo obj => success stream
             $message = "{0} {1}, {2}" -f @(
                 "Failed to get child items."
@@ -500,7 +510,6 @@ function Backup-Updates
         $Spec.ProgressExpected = $files.Count
         $Spec.progressActual = 0
         $status = "Searching for and copying archived files"
-        # $lastWriteProgress = Get-Date
 
         foreach( $file in $files )
         {
@@ -540,7 +549,7 @@ function Backup-Updates
                     # throw
                     $exc = [UnauthorizedAccessException]::new()
                     $localMessage = $exc.Message
-                    $action = "The target file '{0}' is read-only.Either clear the read-only attribute on the source and target files, or else set Force to `$true for '{1}'." -f $destFile.FullName, $Spec.Name
+                    $action = "Could not overwrite the target file '{0}' because it is read-only. Either clear the read-only attribute on the source and target files, or else set Force to `$true for the backup spec named '{1}'." -f $destFile.FullName, $Spec.Name
                     $message = '{0} {1}' -f $localMessage, $action
                     $uaErrorRecord = [ErrorRecord]::new(
                         [UnauthorizedAccessException]::new( $message ),
@@ -558,7 +567,7 @@ function Backup-Updates
                     $unforseenError = $_
                 }
             }
-            catch 
+            catch
             {
                 # some other exception occurred
                 $unforseenError = $_
@@ -570,7 +579,7 @@ function Backup-Updates
                 $PSCmdlet.WriteError( $unforseenError )
                 $context = '{0} {1} {2} {3} {4}' -f @(
                     "Copy error context:"
-                    "Spec name: '$($Spec.Name)';" 
+                    "Spec name: '$($Spec.Name)';"
                     "Source folder: '$Src';"
                     "Destination folder: '$Dest';"
                     "File: '$($file.Name)'." )
@@ -581,14 +590,14 @@ function Backup-Updates
 
             if( $Spec.VersionsOnSrc.Count )
             {
-                $TvArgs = @{ File = $file 
+                $TvArgs = @{ File = $file
                         Versions = $Spec.VersionsOnSrc }
                 Test-Versions @TvArgs
             }
-            if( $Spec.VersionsOnDest.Count ) 
+            if( $Spec.VersionsOnDest.Count )
             {
                 $dFile ='{0}\{1}' -f $Dest, $file.Name
-                $TvArgs = @{ File = Get-Item $dFile 
+                $TvArgs = @{ File = Get-Item $dFile
                     Versions = $Spec.VersionsOnDest }
                 $Spec.FileInfo = $TvArgs.File
                 Test-Versions @TvArgs
@@ -599,21 +608,24 @@ function Backup-Updates
                 Clear-ArchiveBit $file
             }
             # output object to the pipeline
-            $file
+            if( -Not ( $NoPassThru ))
+            {
+                $file
+            }
 
         } # end foreach( $file ... )
 
     } # end Process
 
-    <#
+<#
     .Synopsis
     Backs up a folder
-        
+
     .Description
-    The Backup-Updates module backs up a folder's changed files based on hashtable settings. 
-        
+    The Backup-Updates module backs up a folder's changed files based on hashtable settings.
+
     .Parameter SpecSheet
-    Hashtable(s) intended to be input from the pipeline or as a parameter.
+    [System.Collections.Hashtable[]] intended to be input from the pipeline or as a parameter.
     Required hashtable keys
         Src [string]
         Dest [string]
@@ -624,21 +636,21 @@ function Backup-Updates
         Exclude [string[]]
         Subfolders [boolean]
         Force [boolean]
-        VersionsOnSrc [Hashtable[]]
+        VersionsOnSrc [Hashtable[]] (Experimental may cause unexpected recursion)
         VersionsOnDest [Hashtable[]]
-        DontResetArchiveBit [boolean]
+        DontResetArchiveBit [boolean] (Experimental: may cause saved versions to be overwritten with identical versions)
 
-    Src and Dest may be relative paths. Src and Dest correspond to the source and destination folders. The destination folder need not exist. 
+    Src and Dest may be relative paths. Src and Dest correspond to the source and destination folders. The destination folder need not exist.
 
-    Include is a single wildcard expression or an array of wildcard expressions specifying which files to backup. 
+    Include is a single wildcard expression or an array of wildcard expressions specifying which files to backup.
 
     Exclude is an array of wildcard expressions specifying files to exclude, @() by default.
 
     Force is boolean, $false by default. It controls whether to overwrite read-only files.
 
-    VersionsOnSrc and VersionsOnDest are arrays of hashtables, for saving date-stamped versions of specified files. The key Include is required and accepts a single wildcard expression. The maximum number of version files kept is 5 by default. The default can be changed with the global variable $DefaultMaxVersionQty, and/or customized with the hashtable key MaxQty (see example). The default version folder name is 'versions' and can be changed with the global variable $VersionsFolderName. The subfolder name is autogenerated, and indicates which wildcard expression was used.
+    VersionsOnSrc (experimental - see project ReadMe.md/Issues) and VersionsOnDest are arrays of hashtables, for saving date-stamped versions of specified files. The key Include is required and accepts a single wildcard expression. The maximum number of version files kept is 5 by default. The default can be changed with the global variable $DefaultMaxVersionQty, and/or customized with the hashtable key MaxQty (see example). The default version folder name is 'versions' and can be changed with the global variable $VersionsFolderName. The subfolder name is autogenerated, and indicates which wildcard expression was used.
 
-    DontResetArchiveBit controls whether a source file's archive bit is cleared/reset after the copy operation. Default is $false/$null: the archive bit is cleared by default. Set to $true to retain the source file's archive bit in its set state after copying.
+    DontResetArchiveBit (experimental - see project ReadMe.md/Issues) controls whether a source file's archive bit is cleared/reset after the copy operation. Default is $false/$null: the archive bit is cleared by default. Set to $true to retain the source file's archive bit in its set state after copying.
 
     .Example
     $SpecSheets = @(
@@ -649,9 +661,9 @@ function Backup-Updates
             Subfolders = $true
             Include = "*.ps*", "*.md", ".gitignore", "*.cs"
             Exclude = @( "*.dll", "*.exe" )
-            VersionsOnSrc = @(
-                @{ Include = '*.txt' }, @{ Include = '*.ps1}
-                @{ Include = '*.psm1; MaxQty = 20 }
+            VersionsOnDest = @(
+                @{ Include = '*.txt' }, @{ Include = '*.ps1'}
+                @{ Include = '*.psm1'; MaxQty = 20 }
             )
         }
         @{
@@ -664,18 +676,17 @@ function Backup-Updates
         }
     )
     $SpecSheets | Backup-Updates
-        
+
     .Inputs
     System.Collections.Hashtable object(s).
 
     .Outputs
     System.IO.FileInfo object(s) for the source file for each file copied.
     [ErrorInfo] objects may be sent to the success pipeline.
-        
+
     .Notes
     Calls the Update-Folder function for each hashtable.
-    #>
-
+#>
 }
 
 function Test-Versions
@@ -689,8 +700,8 @@ function Test-Versions
     #>
     param(
         [parameter( Mandatory = $true )]
-        [Hashtable[]] $Versions,
-
+        [Hashtable[]] $Versions
+        ,
         [parameter( Mandatory = $true )]
         [System.IO.FileInfo] $File
     )
@@ -698,8 +709,8 @@ function Test-Versions
 
         if( $File.Name -Like $version.Include ) {
             $versionArgs = @{ Version = $version
-                       File = $File 
-                       ErrorAction = 'Stop' }
+                              File = $File
+                              ErrorAction = 'Stop' }
             Backup-Version @versionArgs
             Remove-ExcessVersions @versionArgs
         }
@@ -716,9 +727,8 @@ function Get-VersionsFolder
         [System.IO.FileInfo] $File
     )
     $root = $File.DirectoryName
-    
-    if( $root -like "*\$VersionsFolderName\*" -And -Not
-        $BackupSpy.FailTestVofV )
+
+    if( $root -like "*\$VersionsFolderName\*" )
     {
         # don't save a version of a version
         return [String]::Empty
@@ -736,8 +746,8 @@ function Backup-Version
 {
     param(
         [parameter( Mandatory = $true )]
-        [Hashtable] $Version,
-
+        [Hashtable] $Version
+        ,
         [parameter( Mandatory = $true,
             ValueFromPipeline = $true )]
         [System.IO.FileInfo] $File
@@ -747,13 +757,12 @@ function Backup-Version
         $gvfArgs = @{ File = $File
                       Version = $Version }
         $targetFolder = Get-VersionsFolder @gvfArgs
-            
+
         if( [String]::Empty -eq $targetFolder )
         {
             return # don't save a version of a version
 
         }
-
         $targetFile = "{0}\{1}_{2}{3}" -f @(
             $targetFolder
             $File.BaseName
@@ -762,10 +771,9 @@ function Backup-Version
         )
         $BackupSpy.Version = $targetFile
 
-        $ciArgs = @{
-            Path = $File.FullName
-            Destination = $targetFile
-            ErrorAction = 'Stop' }
+        $ciArgs = @{ Path = $File.FullName
+                     Destination = $targetFile
+                     ErrorAction = 'Stop' }
         Copy-Item @ciArgs
     }
 }
@@ -789,21 +797,20 @@ function Remove-ExcessVersions
         $File.BaseName
         $File.Extension )
     $path = "{0}\{1}"  -f $targetFolder, $filter
-    $GetChildItemsArgs = @{
-        Path = $path
-        Filter = $filter
-        File = $true
-        ErrorAction = 'Stop' }
-    $soArgs = @{
-        Property = 'LastWriteTime'
-        Descending = $true }
+
+    $GetChildItemsArgs = @{ Path = $path
+                            Filter = $filter
+                            File = $true
+                            ErrorAction = 'Stop' }
+    $soArgs = @{ Property = 'LastWriteTime'
+                 Descending = $true }
     $i = 0
 
     Get-ChildItem @GetChildItemsArgs |
         Sort-Object @soArgs |
         ForEach-Object {
             $i++
-            if( $i -gt $Version.MaxQty ) 
+            if( $i -gt $Version.MaxQty )
             {
                 $file = $_
                 try
@@ -825,7 +832,6 @@ $BackupSpy = @{
     OptimizeCalls = 0
     RemoveCalls = 0
     Version = $null
-    FailTestVofV = $false
 }
 $DefaultMaxVersionQty = 5
 $VersionsFolderName = 'versions'

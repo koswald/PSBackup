@@ -27,7 +27,7 @@ EXAMPLES
 
 using Module ErrorInfo # place at the top of the .ps1/.psm1
 
-try { Get-Item './No such file.txt' -EA 'Stop' }
+try { Get-Item '.\No such file.txt' -EA 'Stop' }
 catch {
     [ErrorInfo]::new( $_, $contextMessageString )
 }
@@ -39,4 +39,4 @@ Error, Error handling.
 SEE ALSO
 
 Get-Help Backup-Updates -Detailed   < note the parameter named "Properies" >
-./IntegrationTests/Test_Pattern_ErrorHandling.ps1
+.\IntegrationTests\Test_Pattern_ErrorHandling.ps1

@@ -13,7 +13,7 @@ If Len(args("exe")) Then
     exe = args("exe")
 Else exe = "pwsh" ' default
 End If
-If Len(args("debug")) Then 
+If Len(args("debug")) Then
     dbug = args("debug")
 Else dbug = dbugByDefault
 End If
@@ -27,7 +27,7 @@ prodEnd = " -DontOpenReport"
 dbugEnd = " -ShowSpecs -PassThru -Debug"
 
 If dbug Then
-    command = exe & common1 & dbugMid & common2 & dbugEnd 
+    command = exe & common1 & dbugMid & common2 & dbugEnd
     visibility = visible
 Else
     command = exe & common1 & common2 & prodEnd
@@ -46,10 +46,10 @@ If dbug Then
     settings = settings + vbInformation
     title = WScript.ScriptName
     timeout = 59 ' seconds
-    
+
     If vbCancel = shell.PopUp( _
         msg, timeout, title, settings _
-    ) Then 
+    ) Then
         Set shell = Nothing
         WScript.Quit
     End If

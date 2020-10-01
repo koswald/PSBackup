@@ -14,7 +14,7 @@ The PSBackup project provides a PowerShell script and supporting modules and doc
 EXAMPLE
 
 # Setup the project
-./Setup.ps1
+.\Setup.ps1
 
 EXAMPLE
 
@@ -24,13 +24,13 @@ EXAMPLE
 $specs = @(
     @{
         Name = "My PowerShell scripts"
-        Src = "$home/Documents/PowerShell"
-        Dest = "$home/Backups/MyPSScripts"
+        Src = "$home\Documents\PowerShell"
+        Dest = "$home\Backups\MyPSScripts"
         Include = "*.ps*", "*.md", "*.txt"
         Subfolders = $true
     }
 )
-$specs | Backup-Updates 
+$specs | Backup-Updates
 
 KEYWORDS
 
@@ -40,6 +40,6 @@ SEE ALSO
 
 ReadMe.md
 Get-Help Backup-Updates [ -Detailed | -Full ]
-Get-Help ./Backup/Backup.ps1 [ -Detailed | -Full ]
+Get-Help .\Backup\Backup.ps1 [ -Detailed | -Full ]
 Get-Help about_Backup
-Backup/BackupTask.md
+Backup\BackupTask.md

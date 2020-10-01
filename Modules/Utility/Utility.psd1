@@ -2,7 +2,7 @@
 # Module manifest for module 'Utility'
 #
 @{
-    RootModule = './Utility.psm1'
+    RootModule = '.\Utility.psm1'
     ModuleVersion = '0.0.1'
     CompatiblePSEditions = @('Core', 'Desktop')
     GUID = '97f37765-4f86-43f6-8c5d-210ce958e292'
@@ -27,12 +27,13 @@
         'Convert-AsciiToChar'
         'Convert-HexToChar'
         'Out-Html'
+        'Remove-TestArtifact'
     )
     CmdletsToExport = @()
     VariablesToExport = '*'
     AliasesToExport = @()
     FileList = @(
-        './Utility.psm1' 
+        '.\Utility.psm1'
     )
 
 }

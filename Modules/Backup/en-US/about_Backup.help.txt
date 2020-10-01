@@ -18,13 +18,13 @@ EXAMPLE
 $specs = @(
     @{
         Name = "My PowerShell scripts"
-        Src = "$home/PowerShell"
-        Dest = "$home/Backups/MyPSScripts"
+        Src = "$home\PowerShell"
+        Dest = "$home\Backups\MyPSScripts"
         Include = "*.ps*", "*.md", "*.txt"
         Subfolders = $true
     }
 )
-$specs | Backup-Updates 
+$specs | Backup-Updates
 
 KEYWORDS
 

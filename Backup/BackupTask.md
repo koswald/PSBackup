@@ -9,7 +9,7 @@ The following are steps and *suggested* settings for creating a new backup task 
 - Open `TaskSchd.msc`.
 - Create a new folder and select it.
 - Under *Actions*, click *Create Task...*
-- In the *General* tab, 
+- In the *General* tab,
 
   - Type a name and a description.
 
@@ -29,8 +29,9 @@ The following are steps and *suggested* settings for creating a new backup task 
   - Type `wscript` in the *Program/script:* field.
   - In the *Add arguments* field, type the path to your customized `BackupTask.vbs`, including the filename. Surround it in quotes if there are spaces in the path, or if you are unsure. Example:
 
-  ```
-  "$env:PSBackup/Backup/BackupTask.vbs"
+  ``` PowerShell
+
+  "$env:PSBackup\Backup\BackupTask.vbs"
   ```
 
   - Click *OK* to save changes.
@@ -46,6 +47,6 @@ The following are steps and *suggested* settings for creating a new backup task 
 
 ## Note
 
-> If you make changes to the task, and save the 
-> changes, you will need to log off then back on, 
-> in order to re-trigger the task.
+> If you make changes to the task, and save the  
+> changes, you will need to log off then back on,  
+> in order to re-trigger the task.  

@@ -16,12 +16,12 @@ Each hashtable specification or "spec" supports the following:
 
 In-console progress bars show per-spec progress and overall progress. The progress bars may not appear in the VS Code Integrated Console.
 
-Run Get-Help Backup-Updates -Detailed for hashtable syntax, features and examples. Run Get-Help ./Backup.ps1 -Full for full help on this script, including parameters.
+Run Get-Help Backup-Updates -Detailed for hashtable syntax, features and examples. Run Get-Help .\Backup.ps1 -Full for full help on this script, including parameters.
 
 .Parameter SpecFile
 A filespec pointing to a file containing the backup specifications, or "specs." The file consists of an array of hashtables assigned to a variable named $specs. The hashtables contain the specifications for what folders and files will be backed up.
 
-- The file must have the .ps1 extension, and 
+- The file must have the .ps1 extension, and
 - The array of hashtables must be assigned to the variable $specs.
 
 Either this parameter or the Specs parameter must be specified. Run Get-Help Backup-Updates -Detailed for hashtable requirements.
@@ -44,7 +44,7 @@ Specifies the .css file for formatting the report. Optional. The default is tabl
 .Parameter Properties
 A hashtable containing the type names and corresponding properties to include in the report file. The default looks something like this:
 
-    @{ 
+    @{
         FileInfo = @(
             'Name'
             'LastWriteTime'
@@ -72,7 +72,7 @@ A hashtable containing the type names and corresponding properties to include in
     }
 
     If an object in pipeline has a type name that is not specified in the Properties parameter, except for [string], then the top-level properties returned by Get-Member -MemberType Property will be logged. in general, ErrorRecord objects are sent to the error stream and are not logged. ErrorInfo objects are sent to the success stream, and so they are also logged.
-    
+
 .Parameter PassThru
 Determines whether to resend objects down the pipeline. Default is $false. If $true, objects continue down the pipeline as well as being sent to the html file. If PassThru is $true, the progress bar may flicker. Alias: pt.
 
@@ -92,7 +92,7 @@ using namespace System.Text
 using Module ErrorInfo
 #Requires -Module Backup
 
-[CmdletBinding( 
+[CmdletBinding(
   DefaultParameterSetName = 'SpecFile' )]
 
 param(
@@ -114,7 +114,7 @@ param(
 
     [string] $CssFile = 'table.css',
 
-    [Hashtable] $Properties = @{ 
+    [Hashtable] $Properties = @{
         FileInfo =@(
             'Name'
             'LastWriteTime'
@@ -125,7 +125,7 @@ param(
             'Message'
             'ScriptName'
             'LineNumber'
-            'ExceptionFullName' 
+            'ExceptionFullName'
         )
         ErrorRecord = @(
             'Exception.Message'
@@ -198,11 +198,11 @@ $scriptBaseName = Get-ScriptBaseName
 $friendlyDatestamp = Get-Datestamp
 $datestamp = Get-Datestamp -ForFileName
 $fileName = "$scriptBaseName-$datestamp.htm"
-$outfile = "$LogFolder/$fileName"
+$outfile = "$LogFolder\$fileName"
 New-Folder $LogFolder
-if( -Not ( Test-Path $LogFolder/$CssFile ))
+if( -Not ( Test-Path $LogFolder\$CssFile ))
 {
-    Copy-Item -Path $PSScriptRoot/$CssFile -Destination $LogFolder
+    Copy-Item -Path $PSScriptRoot\$CssFile -Destination $LogFolder
 }
 $reportFileArgs = @{
     OutFile = $outfile
@@ -216,11 +216,11 @@ $reportFileArgs = @{
     PassThru = $PassThru
 }
 $oc = @{ Count = 0; CountByType = @{} } # object/file count
-    
+
 function Convert-SpecToString( $spec, $keys, $sb ) {
     $sb.Append( "`n@{" ) > $null
     foreach( $key in $keys ) {
-        if( $null -eq $spec.$key ) 
+        if( $null -eq $spec.$key )
         {
             continue # to next $key
         }
@@ -298,7 +298,7 @@ $specs | ForEach-Object -Begin {
         )
     }
     Write-Progress @progressArgs
-    
+
     if( 'SpecFile' -eq $PSCmdlet.ParameterSetName )
     {
         # pass specfile to module for possible error message
@@ -306,7 +306,7 @@ $specs | ForEach-Object -Begin {
     }
 
     # Save spec info for the error message, because after error, $_ will represent the [ErrorRecord].
-    $spec = $_ 
+    $spec = $_
 
     try { Backup-Updates $_ @stopOnErr }
 
